@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Inventario - Inmobiliaria Elite</title>
+    <link rel="stylesheet" href="admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-logo">
+                <span class="material-icons">home</span>
+                <h2>Inmobiliaria Elite</h2>
+            </div>
+
+            <nav>
+                <ul class="sidebar-menu">
+                    <li class="menu-item">
+                        <a href="#" class="active" data-section="dashboard">
+                            <span class="material-icons">dashboard</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#agentes" data-section="agentes">
+                            <span class="material-icons">people</span>
+                            <span>Agentes</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#estadisticas" data-section="estadisticas">
+                            <span class="material-icons">analytics</span>
+                            <span>Estadísticas</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="../index.html" target="_blank">
+                            <span class="material-icons">public</span>
+                            <span>Ver Sitio Público</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-search">
+                <span class="material-icons">search</span>
+                <input type="text" id="searchInput" placeholder="Buscar...">
+            </div>
+
+            <div class="header-actions">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">Cargando...</div>
+                        <div class="user-role" id="userRole">-</div>
+                    </div>
+                </div>
+
+                <button class="btn-logout" id="btnLogout">
+                    <span class="material-icons">logout</span>
+                    Salir
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- ==================== DASHBOARD SECTION ==================== -->
+            <section id="sectionDashboard" class="admin-section active">
+                <div class="page-header">
+                    <h1 class="page-title">Inventario de Propiedades</h1>
+                    <button class="btn-success" id="btnAddProperty">
+                        <span class="material-icons">add</span>
+                        Agregar Propiedad
+                    </button>
+                </div>
+
+                <div class="properties-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Propiedad</th>
+                                <th>Tipo</th>
+                                <th>Precio</th>
+                                <th>Estado</th>
+                                <th>Destacada</th>
+                                <th>En Carrusel</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="propertiesTableBody">
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 2rem; color: #64748B;">
+                                    Cargando propiedades...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ==================== AGENTES SECTION ==================== -->
+            <section id="sectionAgentes" class="admin-section">
+                <div class="page-header">
+                    <h1 class="page-title">Gestión de Agentes</h1>
+                    <button class="btn-success" id="btnAddAgent">
+                        <span class="material-icons">person_add</span>
+                        Agregar Agente
+                    </button>
+                </div>
+
+                <div class="agents-grid" id="agentsGrid">
+                    <div class="loading-placeholder">
+                        <span class="material-icons" style="font-size:3rem;color:#64748B;">people</span>
+                        <p>Cargando agentes...</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ==================== MODAL: Agregar/Editar Propiedad ==================== -->
+    <div id="propertyModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Agregar Propiedad</h2>
+                <button class="modal-close" id="closeModal">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="propertyForm">
+                    <input type="hidden" id="propertyId">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Título</label>
+                            <input type="text" id="titulo" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Descripción</label>
+                            <textarea id="descripcion" rows="4"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tipo de Propiedad</label>
+                            <select id="tipo_propiedad_id" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="1">Casa</option>
+                                <option value="2">Departamento</option>
+                                <option value="3">Terreno</option>
+                                <option value="4">Local Comercial</option>
+                                <option value="5">Oficina</option>
+                                <option value="6">Bodega</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Precio</label>
+                            <input type="number" id="precio" step="0.01" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Dirección</label>
+                            <input type="text" id="direccion" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ciudad</label>
+                            <input type="text" id="ciudad" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Estado</label>
+                            <input type="text" id="estado" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Habitaciones</label>
+                            <input type="number" id="habitaciones" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Baños</label>
+                            <input type="number" id="banos" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Estacionamientos</label>
+                            <input type="number" id="estacionamientos" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label>m²</label>
+                            <input type="number" id="metros_cuadrados" step="0.01" min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Estado de Propiedad</label>
+                            <select id="estado_propiedad">
+                                <option value="venta">En Venta</option>
+                                <option value="renta">En Renta</option>
+                                <option value="vendida">Vendida</option>
+                                <option value="rentada">Rentada</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="destacada">
+                                <span>Propiedad Destacada</span>
+                            </label>
+                            <label
+                                style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-top: 0.5rem;">
+                                <input type="checkbox" id="en_carousel">
+                                <span>Mostrar en Carrusel</span>
+                            </label>
+                            <label
+                                style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-top: 0.5rem;">
+                                <input type="checkbox" id="mejor_venta">
+                                <span>Mejor Venta</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Imagen Principal</label>
+                            <div id="imagePreviewContainer" style="margin-bottom: 10px; display: none;">
+                                <img id="currentImagePreview" src="" alt="Vista previa"
+                                    style="max-width: 100%; max-height: 200px; border-radius: 8px; object-fit: cover;">
+                            </div>
+                            <input type="file" id="imagen_file" accept="image/*">
+                            <input type="hidden" id="imagen_principal">
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" id="cancelModal">Cancelar</button>
+                        <button type="submit" class="btn-primary">
+                            <span class="material-icons">save</span>
+                            Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: Agregar/Editar Agente ==================== -->
+    <div id="agentModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="agentModalTitle">Agregar Agente</h2>
+                <button class="modal-close" id="closeAgentModal">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="agentForm">
+                    <input type="hidden" id="agentId">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text" id="agentNombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Apellido</label>
+                            <input type="text" id="agentApellido" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="agentEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono</label>
+                            <input type="text" id="agentTelefono" maxlength="10" placeholder="10 dígitos">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cargo</label>
+                            <input type="text" id="agentCargo">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Antigüedad</label>
+                            <input type="text" id="agentAntiguedad" placeholder="Ej: 5 años">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="agentActivo" checked>
+                                <span>Agente Activo</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" id="cancelAgentModal">Cancelar</button>
+                        <button type="submit" class="btn-primary">
+                            <span class="material-icons">save</span>
+                            Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: Asignar Propiedades ==================== -->
+    <div id="assignModal" class="modal" style="display: none;">
+        <div class="modal-content modal-wide">
+            <div class="modal-header">
+                <h2 id="assignModalTitle">Asignar Propiedades</h2>
+                <button class="modal-close" id="closeAssignModal">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="assign-subtitle" id="assignSubtitle">Selecciona las propiedades para este agente</p>
+                <div class="assign-search">
+                    <span class="material-icons">search</span>
+                    <input type="text" id="assignSearchInput" placeholder="Filtrar propiedades...">
+                </div>
+                <div class="assign-properties-list" id="assignPropertiesList">
+                    <p style="text-align:center;color:#64748B;">Cargando propiedades...</p>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelAssignModal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal modal-success" style="display: none;">
+        <div class="modal-content">
+            <div class="success-icon">
+                <span class="material-icons">check</span>
+            </div>
+            <h2 class="success-title" id="successTitle">¡Éxito!</h2>
+            <p class="success-message" id="successMessage">Operación realizada correctamente.</p>
+            <button class="btn-success-modal" id="btnSuccessClose">Aceptar</button>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal modal-danger" style="display: none;">
+        <div class="modal-content">
+            <div class="success-icon">
+                <span class="material-icons">warning</span>
+            </div>
+            <h2 class="success-title" id="confirmTitle">¿Estás seguro?</h2>
+            <p class="success-message" id="confirmMessage">Esta acción no se puede deshacer.</p>
+            <div class="modal-actions-row">
+                <button class="btn-cancel-modal" id="btnConfirmCancel">Cancelar</button>
+                <button class="btn-danger-modal" id="btnConfirmAction">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+
+</html>

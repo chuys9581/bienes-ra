@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: inmobiliaria_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: inmobiliaria_db
+      MYSQL_USER: inmobiliaria_user
+      MYSQL_PASSWORD: inmobiliaria_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - inmobiliaria_network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: inmobiliaria_phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: inmobiliaria_user
+      PMA_PASSWORD: inmobiliaria_pass
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
+    networks:
+      - inmobiliaria_network
+
+volumes:
+  mysql_data:
+
+
+networks:
+  inmobiliaria_network:
+    driver: bridge

@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Encuentra tu hogar ideal - Inmobiliaria profesional con las mejores propiedades">
+    <title>Inmobiliaria Elite - Tu Hogar Ideal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <span class="material-icons logo-icon">home</span>
+                    <span class="logo-text">Inmobiliaria <span class="elite">Elite</span></span>
+                </div>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#hero" class="nav-link active">Inicio</a></li>
+                    <li><a href="#propiedades" class="nav-link">Propiedades</a></li>
+                    <li><a href="#servicios" class="nav-link">Servicios</a></li>
+                    <li><a href="#contacto" class="nav-link">Contacto</a></li>
+                </ul>
+                <button class="menu-toggle" id="menuToggle">
+                    <span class="material-icons">menu</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Carousel Section -->
+    <section class="hero-carousel" id="hero">
+        <!-- Carousel Container -->
+        <div class="carousel-container">
+            <!-- Carousel Slides -->
+            <div class="carousel-slides" id="carouselSlides">
+                <!-- Las slides se cargarán dinámicamente -->
+            </div>
+
+            <!-- Carousel Controls -->
+            <button class="carousel-control prev" id="carouselPrev">
+                <span class="material-icons">chevron_left</span>
+            </button>
+            <button class="carousel-control next" id="carouselNext">
+                <span class="material-icons">chevron_right</span>
+            </button>
+
+            <!-- Property Card -->
+            <div class="carousel-property-card" id="carouselPropertyCard">
+                <!-- La card se actualizará dinámicamente -->
+            </div>
+
+            <!-- Carousel Indicators -->
+            <div class="carousel-indicators" id="carouselIndicators">
+                <!-- Los indicadores se generarán dinámicamente -->
+            </div>
+        </div>
+
+        <div class="hero-scroll">
+            <span class="material-icons">expand_more</span>
+        </div>
+    </section>
+
+    <!-- Barra de Búsqueda Avanzada -->
+    <section class="search-section">
+        <div class="container">
+            <div class="advanced-search-bar">
+                <div class="search-field-group">
+                    <label>PALABRA CLAVE</label>
+                    <div class="search-input-wrapper">
+                        <input type="text" id="keywordSearch" placeholder="Ingresa palabra clave...">
+                        <span class="material-icons">search</span>
+                    </div>
+                </div>
+                <div class="search-field-group">
+                    <label>ESTADO</label>
+                    <select id="statusSearch">
+                        <option value="">Todos los Estados</option>
+                        <option value="venta">En Venta</option>
+                        <option value="renta">En Renta</option>
+                        <option value="vendida">Vendida</option>
+                        <option value="rentada">Rentada</option>
+                    </select>
+                </div>
+                <div class="search-field-group">
+                    <label>TIPO</label>
+                    <select id="typeSearch">
+                        <option value="">Todos los Tipos</option>
+                        <option value="1">Casa</option>
+                        <option value="2">Departamento</option>
+                        <option value="3">Terreno</option>
+                        <option value="4">Local Comercial</option>
+                        <option value="5">Oficina</option>
+                        <option value="6">Bodega</option>
+                    </select>
+                </div>
+                <button class="advanced-btn" id="advancedBtn">
+                    <span class="material-icons">tune</span>
+                    Avanzado
+                </button>
+                <button class="search-btn-main" id="searchMainBtn">
+                    Buscar
+                </button>
+            </div>
+
+            <!-- Panel de Filtros Avanzados (Expandible) -->
+            <div class="advanced-filters-panel" id="advancedFiltersPanel">
+                <div class="advanced-filters-grid">
+                    <div class="search-field-group">
+                        <label>HABITACIONES</label>
+                        <select id="bedroomsFilter">
+                            <option value="">Habitaciones</option>
+                            <option value="1">1+</option>
+                            <option value="2">2+</option>
+                            <option value="3">3+</option>
+                            <option value="4">4+</option>
+                            <option value="5">5+</option>
+                        </select>
+                    </div>
+                    <div class="search-field-group">
+                        <label>BAÑOS</label>
+                        <select id="bathroomsFilter">
+                            <option value="">Baños</option>
+                            <option value="1">1+</option>
+                            <option value="2">2+</option>
+                            <option value="3">3+</option>
+                            <option value="4">4+</option>
+                        </select>
+                    </div>
+                    <div class="search-field-group">
+                        <label>PAÍSES</label>
+                        <select id="countriesFilter">
+                            <option value="">Todos los Países</option>
+                            <option value="mx">México</option>
+                            <option value="us">Estados Unidos</option>
+                            <option value="ca">Canadá</option>
+                        </select>
+                    </div>
+                    <div class="search-field-group">
+                        <label>COLONIAS</label>
+                        <select id="neighborhoodsFilter">
+                            <option value="">Todas las Colonias</option>
+                            <option value="centro">Centro</option>
+                            <option value="norte">Zona Norte</option>
+                            <option value="sur">Zona Sur</option>
+                        </select>
+                    </div>
+                    <div class="search-field-group">
+                        <label>GARAJES</label>
+                        <select id="garagesFilter">
+                            <option value="">Cualquier Garaje</option>
+                            <option value="1">1+</option>
+                            <option value="2">2+</option>
+                            <option value="3">3+</option>
+                        </select>
+                    </div>
+                    <div class="search-field-group">
+                        <label>ETIQUETA</label>
+                        <select id="labelFilter">
+                            <option value="">Todas las Etiquetas</option>
+                            <option value="nuevo">Nuevo</option>
+                            <option value="oferta">Oferta</option>
+                            <option value="exclusivo">Exclusivo</option>
+                        </select>
+                    </div>
+                    <div class="search-field-group">
+                        <label>ID PROPIEDAD</label>
+                        <input type="text" id="propertyIdFilter" placeholder="Property ID">
+                    </div>
+                </div>
+
+                <!-- Rangos de Precio y Tamaño -->
+                <div class="range-filters">
+                    <div class="range-filter-group">
+                        <label>RANGO DE PRECIO: DE $200 A $2,500,000</label>
+                        <div class="range-slider-wrapper">
+                            <input type="range" id="priceMin" class="range-slider" min="200" max="2500000" value="200"
+                                step="1000">
+                            <input type="range" id="priceMax" class="range-slider" min="200" max="2500000"
+                                value="2500000" step="1000">
+                        </div>
+                    </div>
+                    <div class="range-filter-group">
+                        <label>RANGO DE TAMAÑO: DE 10 M² A 1,000 M²</label>
+                        <div class="range-slider-wrapper">
+                            <input type="range" id="sizeMin" class="range-slider" min="10" max="1000" value="10"
+                                step="10">
+                            <input type="range" id="sizeMax" class="range-slider" min="10" max="1000" value="1000"
+                                step="10">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Otras Características -->
+                <div class="other-features">
+                    <div class="features-toggle" id="featuresToggle">
+                        <span class="material-icons">add_circle_outline</span>
+                        <span>OTRAS CARACTERÍSTICAS</span>
+                    </div>
+                    <div class="features-checkboxes" id="featuresCheckboxes">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="airConditioning" name="features" value="air-conditioning">
+                            <label for="airConditioning">Aire Acondicionado</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="barbecue" name="features" value="barbecue">
+                            <label for="barbecue">Asador</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="dryer" name="features" value="dryer">
+                            <label for="dryer">Secadora</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="gym" name="features" value="gym">
+                            <label for="gym">Gimnasio</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="laundry" name="features" value="laundry">
+                            <label for="laundry">Lavandería</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lawn" name="features" value="lawn">
+                            <label for="lawn">Jardín</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="microwave" name="features" value="microwave">
+                            <label for="microwave">Microondas</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="outdoorShower" name="features" value="outdoor-shower">
+                            <label for="outdoorShower">Ducha Exterior</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="refrigerator" name="features" value="refrigerator">
+                            <label for="refrigerator">Refrigerador</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="sauna" name="features" value="sauna">
+                            <label for="sauna">Sauna</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="swimmingPool" name="features" value="swimming-pool">
+                            <label for="swimmingPool">Alberca</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="tvCable" name="features" value="tv-cable">
+                            <label for="tvCable">TV por Cable</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="washer" name="features" value="washer">
+                            <label for="washer">Lavadora</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="wifi" name="features" value="wifi">
+                            <label for="wifi">WiFi</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="windowCoverings" name="features" value="window-coverings">
+                            <label for="windowCoverings">Cortinas</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Propiedades Destacadas -->
+    <section class="featured-properties-section" id="propiedades">
+        <div class="container">
+            <div class="featured-header">
+                <div>
+                    <h2 class="featured-title">Propiedades Destacadas</h2>
+                    <p class="featured-subtitle">Descubre nuestras mejores opciones seleccionadas especialmente para ti
+                        con ubicaciones privilegiadas</p>
+                </div>
+                <a href="#" class="see-all-link">
+                    Ver todas las propiedades
+                    <span class="material-icons">arrow_forward</span>
+                </a>
+            </div>
+
+            <!-- Grid de Propiedades -->\r\n <div class="featured-properties-grid" id="featuredGrid">
+                <!-- Las propiedades se cargarán dinámicamente -->\r\n
+            </div>
+        </div>
+    </section>
+
+    <!-- Best Properties For Sale -->
+    <section class="best-properties-section">
+        <div class="container">
+            <div class="section-header-standard">
+                <div>
+                    <h2 class="section-title-standard">Mejores Propiedades En Venta</h2>
+                    <p class="section-subtitle-standard">Descubre nuestras mejores opciones seleccionadas especialmente
+                        para ti con ubicaciones privilegiadas</p>
+                </div>
+                <a href="#" class="see-all-link">
+                    Ver todas las propiedades
+                    <span class="material-icons">arrow_forward</span>
+                </a>
+            </div>
+
+            <div class="best-properties-grid">
+                <!-- Propiedad Principal (Grande - Izquierda) -->
+                <div class="best-property-main">
+                    <div class="best-property-card large-card">
+                        <div class="best-property-image">
+                            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop"
+                                alt="Store in Woodside">
+                            <div class="best-badges">
+                                <span class="best-badge badge-featured">DESTACADA</span>
+                                <span class="best-badge badge-for-sale">EN VENTA</span>
+                            </div>
+                        </div>
+                        <div class="best-property-content">
+                            <p class="best-property-address">39-11 61st St, Woodside, New York</p>
+                            <h3 class="best-property-title">Local en Woodside, New York</h3>
+                            <div class="best-property-footer">
+                                <span class="best-property-price">$1,250,000</span>
+                                <div class="best-property-features">
+                                    <div class="best-feature-item">
+                                        <span class="material-icons">bed</span>
+                                        <span>3 Hab</span>
+                                    </div>
+                                    <div class="best-feature-item">
+                                        <span class="material-icons">bathtub</span>
+                                        <span>2 Ba</span>
+                                    </div>
+                                    <div class="best-feature-item">
+                                        <span class="material-icons">square_foot</span>
+                                        <span>900 m²</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Propiedades Secundarias (Pequeñas - Derecha) -->
+                <div class="best-properties-secondary">
+                    <div class="best-property-card small-card">
+                        <div class="best-property-small-inner">
+                            <div class="best-property-image-small">
+                                <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&h=300&fit=crop"
+                                    alt="Hermosa casa al norte">
+                                <div class="best-badges">
+                                    <span class="best-badge badge-featured">DESTACADA</span>
+                                </div>
+                            </div>
+                            <div class="best-property-content-small">
+                                <h4 class="best-property-title-small">Hermosa casa al norte</h4>
+                                <p class="best-property-address-small">393 Lewis Ave, Brooklyn, New York</p>
+                                <span class="best-property-status">EN VENTA</span>
+                                <p class="best-property-description">Massa tempor nec feugiat nisl pretium. Egestas
+                                    fringilla phasellus faucibus scelerisque eleifend donec. Porta nibh venenatis cras
+                                    sed felis eget velit</p>
+                                <div class="best-property-footer-small">
+                                    <span class="best-property-price-small">$1,250,000</span>
+                                    <div class="best-property-features-small">
+                                        <div class="best-feature-item-small">
+                                            <span class="material-icons">bed</span>
+                                            <span>3</span>
+                                        </div>
+                                        <div class="best-feature-item-small">
+                                            <span class="material-icons">bathtub</span>
+                                            <span>2</span>
+                                        </div>
+                                        <div class="best-feature-item-small">
+                                            <span class="material-icons">square_foot</span>
+                                            <span>900</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="best-property-card small-card">
+                        <div class="best-property-small-inner">
+                            <div class="best-property-image-small">
+                                <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop"
+                                    alt="Casa Lomas de Machali">
+                                <div class="best-badges">
+                                    <span class="best-badge badge-featured">DESTACADA</span>
+                                </div>
+                            </div>
+                            <div class="best-property-content-small">
+                                <h4 class="best-property-title-small">Casa Lomas de Machali</h4>
+                                <p class="best-property-address-small">145 Brooklyn Ave, Brooklyn, New York</p>
+                                <span class="best-property-status">EN VENTA</span>
+                                <p class="best-property-description">Massa tempor nec feugiat nisl pretium. Egestas
+                                    fringilla phasellus faucibus scelerisque eleifend donec. Porta nibh venenatis cras
+                                    sed felis eget velit</p>
+                                <div class="best-property-footer-small">
+                                    <span class="best-property-price-small">$1,250,000</span>
+                                    <div class="best-property-features-small">
+                                        <div class="best-feature-item-small">
+                                            <span class="material-icons">bed</span>
+                                            <span>3</span>
+                                        </div>
+                                        <div class="best-feature-item-small">
+                                            <span class="material-icons">bathtub</span>
+                                            <span>2</span>
+                                        </div>
+                                        <div class="best-feature-item-small">
+                                            <span class="material-icons">square_foot</span>
+                                            <span>900</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Best Properties For Rent -->
+    <section class="rent-properties-section">
+        <div class="container">
+            <div class="section-header-standard">
+                <div>
+                    <h2 class="section-title-standard">Mejores Propiedades En Renta</h2>
+                    <p class="section-subtitle-standard">Descubre nuestras mejores opciones seleccionadas especialmente
+                        para ti con ubicaciones privilegiadas</p>
+                </div>
+                <a href="#" class="see-all-link">
+                    Ver todas las propiedades
+                    <span class="material-icons">arrow_forward</span>
+                </a>
+            </div>
+
+            <div class="rent-properties-grid">
+                <!-- Propiedad 1 -->
+                <div class="rent-property-card">
+                    <div class="rent-property-image">
+                        <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=400&fit=crop"
+                            alt="House in Foxhall">
+                        <div class="rent-overlay"></div>
+                        <div class="rent-badges">
+                            <span class="rent-badge badge-featured">DESTACADA</span>
+                            <span class="rent-badge badge-for-rent">EN RENTA</span>
+                        </div>
+                        <div class="rent-property-info">
+                            <h3 class="rent-property-title">Casa en Foxhall Ave, Kingston</h3>
+                            <p class="rent-property-address">289 Foxhall Ave, Kingston</p>
+                            <div class="rent-property-footer">
+                                <span class="rent-property-price">$550 / mes</span>
+                                <div class="rent-property-features">
+                                    <span><i class="material-icons">bed</i> 3</span>
+                                    <span><i class="material-icons">bathtub</i> 2</span>
+                                    <span><i class="material-icons">square_foot</i> 900</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Propiedad 2 -->
+                <div class="rent-property-card">
+                    <div class="rent-property-image">
+                        <img src="https://images.unsplash.com/photo-1600210492493-0946911123ea?w=600&h=400&fit=crop"
+                            alt="Luxury Villa">
+                        <div class="rent-overlay"></div>
+                        <div class="rent-badges">
+                            <span class="rent-badge badge-featured">DESTACADA</span>
+                            <span class="rent-badge badge-for-rent">EN RENTA</span>
+                        </div>
+                        <div class="rent-property-info">
+                            <h3 class="rent-property-title">Villa de Lujo en Alice</h3>
+                            <p class="rent-property-address">909 S Cameron St, Alice</p>
+                            <div class="rent-property-footer">
+                                <span class="rent-property-price">$550 / mes</span>
+                                <div class="rent-property-features">
+                                    <span><i class="material-icons">bed</i> 3</span>
+                                    <span><i class="material-icons">bathtub</i> 2</span>
+                                    <span><i class="material-icons">square_foot</i> 900</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Propiedad 3 - Grande (ocupa 2 filas en columna 3) -->
+                <div class="rent-property-card rent-property-large">
+                    <div class="rent-property-image">
+                        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=800&fit=crop"
+                            alt="Single House Near Los Angeles">
+                        <div class="rent-overlay"></div>
+                        <div class="rent-badges">
+                            <span class="rent-badge badge-featured">DESTACADA</span>
+                            <span class="rent-badge badge-for-rent">EN RENTA</span>
+                        </div>
+                        <div class="rent-property-info">
+                            <h3 class="rent-property-title">Casa Individual Cerca Los Ángeles</h3>
+                            <p class="rent-property-address">10768 Bellagio Rd, Los Angeles</p>
+                            <div class="rent-property-footer">
+                                <span class="rent-property-price">$550 / mes</span>
+                                <div class="rent-property-features">
+                                    <span><i class="material-icons">bed</i> 3</span>
+                                    <span><i class="material-icons">bathtub</i> 2</span>
+                                    <span><i class="material-icons">square_foot</i> 900</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Propiedad 4 -->
+                <div class="rent-property-card">
+                    <div class="rent-property-image">
+                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop"
+                            alt="House Highland">
+                        <div class="rent-overlay"></div>
+                        <div class="rent-badges">
+                            <span class="rent-badge badge-featured">DESTACADA</span>
+                            <span class="rent-badge badge-for-rent">EN RENTA</span>
+                        </div>
+                        <div class="rent-property-info">
+                            <h3 class="rent-property-title">Casa Highland Ave Los Ángeles</h3>
+                            <p class="rent-property-address">3854 Cazador St, Los Angeles</p>
+                            <div class="rent-property-footer">
+                                <span class="rent-property-price">$550 / mes</span>
+                                <div class="rent-property-features">
+                                    <span><i class="material-icons">bed</i> 3</span>
+                                    <span><i class="material-icons">bathtub</i> 2</span>
+                                    <span><i class="material-icons">square_foot</i> 900</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Propiedad 5 -->
+                <div class="rent-property-card">
+                    <div class="rent-property-image">
+                        <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=600&h=400&fit=crop"
+                            alt="Garden Gingerbread">
+                        <div class="rent-overlay"></div>
+                        <div class="rent-badges">
+                            <span class="rent-badge badge-featured">DESTACADA</span>
+                            <span class="rent-badge badge-for-rent">EN RENTA</span>
+                        </div>
+                        <div class="rent-property-info">
+                            <h3 class="rent-property-title">Jardín Gingerbread Bar</h3>
+                            <p class="rent-property-address">8 N Front St, Kingston</p>
+                            <div class="rent-property-footer">
+                                <span class="rent-property-price">$550 / mes</span>
+                                <div class="rent-property-features">
+                                    <span><i class="material-icons">bed</i> 3</span>
+                                    <span><i class="material-icons">bathtub</i> 2</span>
+                                    <span><i class="material-icons">square_foot</i> 900</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Servicios -->
+    <section class="servicios-section" id="servicios">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Nuestros <span class="gradient-text">Servicios</span></h2>
+                <p class="section-subtitle">Soluciones completas para todas tus necesidades inmobiliarias</p>
+            </div>
+
+            <div class="servicios-grid">
+                <div class="servicio-card">
+                    <div class="servicio-icon">
+                        <span class="material-icons">real_estate_agent</span>
+                    </div>
+                    <h3>Compra y Venta</h3>
+                    <p>Asesoría profesional para comprar o vender tu propiedad al mejor precio del mercado.</p>
+                </div>
+
+                <div class="servicio-card">
+                    <div class="servicio-icon">
+                        <span class="material-icons">vpn_key</span>
+                    </div>
+                    <h3>Renta y Arrendamiento</h3>
+                    <p>Encuentra el inquilino ideal o la propiedad perfecta para rentar con nuestro servicio
+                        especializado.</p>
+                </div>
+
+                <div class="servicio-card">
+                    <div class="servicio-icon">
+                        <span class="material-icons">gavel</span>
+                    </div>
+                    <h3>Asesoría Legal</h3>
+                    <p>Soporte legal completo en todos los trámites y procesos de tu transacción inmobiliaria.</p>
+                </div>
+
+                <div class="servicio-card">
+                    <div class="servicio-icon">
+                        <span class="material-icons">analytics</span>
+                    </div>
+                    <h3>Valuación de Propiedades</h3>
+                    <p>Conoce el valor real de tu propiedad con nuestro análisis de mercado profesional.</p>
+                </div>
+
+                <div class="servicio-card">
+                    <div class="servicio-icon">
+                        <span class="material-icons">handshake</span>
+                    </div>
+                    <h3>Inversión Inmobiliaria</h3>
+                    <p>Asesoría experta para invertir en bienes raíces con el mejor retorno de inversión.</p>
+                </div>
+
+                <div class="servicio-card">
+                    <div class="servicio-icon">
+                        <span class="material-icons">construction</span>
+                    </div>
+                    <h3>Desarrollos Nuevos</h3>
+                    <p>Acceso exclusivo a preventas y desarrollos inmobiliarios de última generación.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Estadísticas -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" data-target="1500">0</div>
+                    <div class="stat-label">Propiedades Vendidas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-target="2300">0</div>
+                    <div class="stat-label">Clientes Satisfechos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-target="15">0</div>
+                    <div class="stat-label">Años de Experiencia</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-target="98">0</div>
+                    <div class="stat-label">% Satisfacción</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <!-- Columna 1: Logo e Información -->
+                <div class="footer-col footer-col-info">
+                    <div class="footer-logo">
+                        <span class="material-icons logo-icon">home</span>
+                        <span class="logo-text">Inmobiliaria <span class="elite">Elite</span></span>
+                    </div>
+                    <div class="footer-contact">
+                        <p class="footer-address">101 Howard Street #2 San Francisco</p>
+                        <p class="footer-email">contact@inmoe.co</p>
+                        <p class="footer-phone">(+91) 123 09870</p>
+                        <p class="footer-website">www.inmobid.com</p>
+                    </div>
+                </div>
+
+                <!-- Columna 2: Búsquedas Populares -->
+                <div class="footer-col">
+                    <h4>Búsquedas Populares</h4>
+                    <ul>
+                        <li><a href="#">Apartamento en Renta</a></li>
+                        <li><a href="#">Apartamento Caro to Venta</a></li>
+                        <li><a href="#">Oficinas en Compra</a></li>
+                        <li><a href="#">Oficinas en Renta</a></li>
+                    </ul>
+                </div>
+
+                <!-- Columna 3: Enlaces Rápidos -->
+                <div class="footer-col">
+                    <h4>Enlaces Rápidos</h4>
+                    <ul>
+                        <li><a href="#">Términos de Uso</a></li>
+                        <li><a href="#">Política de Privacidad</a></li>
+                        <li><a href="#">Precios</a></li>
+                        <li><a href="#">Contacto de Soporte</a></li>
+                        <li><a href="#">Carreras</a></li>
+                        <li><a href="#">Preguntas Frecuentes</a></li>
+                    </ul>
+                </div>
+
+                <!-- Columna 4: Newsletter -->
+                <div class="footer-col footer-col-newsletter">
+                    <h4>Regístrate para Nuestro Newsletter</h4>
+                    <p class="newsletter-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eligendi non
+                        quis.</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Tu correo" required>
+                        <button type="submit">Suscribirse</button>
+                    </form>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Twitter"><span
+                                class="material-icons">tag_faces</span></a>
+                        <a href="#" class="social-link" aria-label="Facebook"><span
+                                class="material-icons">facebook</span></a>
+                        <a href="#" class="social-link" aria-label="Instagram"><span
+                                class="material-icons">photo_camera</span></a>
+                        <a href="#" class="social-link" aria-label="LinkedIn"><span
+                                class="material-icons">business</span></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <div class="footer-links">
+                        <a href="#">Términos de Uso</a>
+                        <span class="separator">-</span>
+                        <a href="#">Política de Privacidad</a>
+                    </div>
+                    <p class="footer-copyright">© 2026 Inmobid. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal de Propiedad -->
+    <div class="modal" id="propiedadModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">
+                <span class="material-icons">close</span>
+            </button>
+            <div id="modalBody">
+                <!-- Contenido dinámico del modal -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Principal como Módulo -->
+    <script type="module" src="./js/main.js"></script>
+</body>
+
+</html>

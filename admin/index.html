@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso al Panel - Inmobiliaria Elite</title>
+    <link rel="stylesheet" href="admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <span class="material-icons logo-icon">home</span>
+                <h1>Inmobiliaria <span class="elite">Elite</span></h1>
+                <p id="formTitle">Panel de Inventario</p>
+            </div>
+
+            <!-- Formulario de Login -->
+            <form id="loginForm" class="auth-form">
+                <div class="input-group">
+                    <span class="material-icons">person</span>
+                    <input type="text" id="loginUsername" placeholder="Usuario o Email" required>
+                </div>
+
+                <div class="input-group">
+                    <span class="material-icons">lock</span>
+                    <input type="password" id="loginPassword" placeholder="Contraseña" required>
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    <span class="material-icons">login</span>
+                    Iniciar Sesión
+                </button>
+
+                <p class="form-toggle">
+                    ¿No hay usuarios? <a href="#" id="showRegister">Crear primer usuario</a>
+                </p>
+            </form>
+
+            <!-- Formulario de Registro (oculto inicialmente) -->
+            <form id="registerForm" class="auth-form" style="display:none;">
+                <div class="alert info-alert">
+                    <span class="material-icons">info</span>
+                    <p>El primer usuario registrado será <strong>Administrador</strong>. Los siguientes serán
+                        <strong>Vendedores</strong>.</p>
+                </div>
+
+                <div class="input-group">
+                    <span class="material-icons">person</span>
+                    <input type="text" id="registerUsername" placeholder="Usuario" required>
+                </div>
+
+                <div class="input-group">
+                    <span class="material-icons">badge</span>
+                    <input type="text" id="registerNombre" placeholder="Nombre Completo" required>
+                </div>
+
+                <div class="input-group">
+                    <span class="material-icons">email</span>
+                    <input type="email" id="registerEmail" placeholder="Correo Electrónico" required>
+                </div>
+
+                <div class="input-group">
+                    <span class="material-icons">lock</span>
+                    <input type="password" id="registerPassword" placeholder="Contraseña" required minlength="6">
+                </div>
+
+                <div class="input-group">
+                    <span class="material-icons">lock_outline</span>
+                    <input type="password" id="registerPasswordConfirm" placeholder="Confirmar Contraseña" required
+                        minlength="6">
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    <span class="material-icons">person_add</span>
+                    Registrar Usuario
+                </button>
+
+                <p class="form-toggle">
+                    ¿Ya tienes cuenta? <a href="#" id="showLogin">Iniciar sesión</a>
+                </p>
+            </form>
+
+            <div id="message" class="message"></div>
+        </div>
+
+        <div class="login-footer">
+            <p>&copy; 2026 Inmobiliaria Elite. Todos los derechos reservados.</p>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+
+</html>
