@@ -60,6 +60,15 @@ export class ApiService {
     }
 
     /**
+     * Obtiene propiedades marcadas como "Mejor Renta".
+     * @param {number} limit - Límite de propiedades.
+     * @returns {Promise<Object>}
+     */
+    async getBestRentProperties(limit = 5) {
+        return this.getProperties(`mejor_renta=1&limit=${limit}`);
+    }
+
+    /**
      * Obtiene propiedades destacadas para la sección "Propiedades Destacadas".
      * @param {number} limit - Límite de propiedades.
      * @returns {Promise<Object>}

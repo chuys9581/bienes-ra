@@ -36,6 +36,7 @@ class Agente {
                       email = :email,
                       telefono = :telefono,
                       cargo = :cargo,
+                      imagen = :imagen,
                       antiguedad = :antiguedad,
                       activo = :activo";
 
@@ -52,6 +53,7 @@ class Agente {
                       email = :email,
                       telefono = :telefono,
                       cargo = :cargo,
+                      imagen = :imagen,
                       antiguedad = :antiguedad,
                       activo = :activo
                   WHERE id = :id";
@@ -75,6 +77,7 @@ class Agente {
     public function getAssignedProperties($agenteId) {
         $query = "SELECT p.id, p.titulo, p.ciudad, p.estado, p.precio, p.estado_propiedad, 
                          p.imagen_principal, tp.nombre as tipo_nombre,
+                         p.habitaciones, p.banos, p.metros_cuadrados,
                          ap.assigned_at
                   FROM {$this->pivotTable} ap
                   INNER JOIN propiedades p ON ap.propiedad_id = p.id
@@ -96,6 +99,7 @@ class Agente {
     public function getAvailableProperties($agenteId) {
         $query = "SELECT p.id, p.titulo, p.ciudad, p.estado, p.precio, p.estado_propiedad,
                          p.imagen_principal, tp.nombre as tipo_nombre,
+                         p.habitaciones, p.banos, p.metros_cuadrados,
                          CASE WHEN ap_mine.agente_id IS NOT NULL THEN 1 ELSE 0 END as asignada
                   FROM propiedades p
                   LEFT JOIN tipo_propiedad tp ON p.tipo_propiedad_id = tp.id
@@ -139,6 +143,38 @@ class Agente {
         return $stmt->execute();
     }
 
+    // --- Reviews ---
+
+    public function getReviews($agenteId) {
+        $query = "SELECT * FROM reviews WHERE agente_id = :agente_id ORDER BY created_at DESC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(':agente_id', $agenteId, PDO::PARAM_INT);
+        $stmt->execute();
+        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Calculate average
+        $avgQuery = "SELECT AVG(rating) as average_rating, COUNT(*) as total_reviews FROM reviews WHERE agente_id = :agente_id";
+        $stmtAvg = $this->conn->prepare($avgQuery);
+        $stmtAvg->bindValue(':agente_id', $agenteId, PDO::PARAM_INT);
+        $stmtAvg->execute();
+        $stats = $stmtAvg->fetch(PDO::FETCH_ASSOC);
+
+        return [
+            'reviews' => $reviews,
+            'stats' => $stats
+        ];
+    }
+
+    public function addReview($agenteId, $data) {
+        $query = "INSERT INTO reviews (agente_id, user_name, rating, comment) VALUES (:agente_id, :user_name, :rating, :comment)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(':agente_id', $agenteId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_name', htmlspecialchars(strip_tags($data['user_name'])));
+        $stmt->bindValue(':rating', (int)$data['rating'], PDO::PARAM_INT);
+        $stmt->bindValue(':comment', htmlspecialchars(strip_tags($data['comment'])));
+        return $stmt->execute();
+    }
+
     private function bindParams($stmt, $data) {
         $stmt->bindValue(':nombre', htmlspecialchars(strip_tags($data['nombre'] ?? '')));
         $stmt->bindValue(':apellido', htmlspecialchars(strip_tags($data['apellido'] ?? '')));
@@ -146,6 +182,7 @@ class Agente {
         $telefono = substr(preg_replace('/[^0-9]/', '', $data['telefono'] ?? ''), 0, 10);
         $stmt->bindValue(':telefono', $telefono);
         $stmt->bindValue(':cargo', htmlspecialchars(strip_tags($data['cargo'] ?? '')));
+        $stmt->bindValue(':imagen', htmlspecialchars(strip_tags($data['imagen'] ?? '')));
         $stmt->bindValue(':antiguedad', htmlspecialchars(strip_tags($data['antiguedad'] ?? '')));
         $stmt->bindValue(':activo', isset($data['activo']) ? (int)$data['activo'] : 1, PDO::PARAM_INT);
     }

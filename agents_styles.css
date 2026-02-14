@@ -1,0 +1,399 @@
+/* --- Agents Section --- */
+.agents-section {
+    padding: 80px 0;
+    background-color: #fff;
+    text-align: center;
+}
+
+.section-subtitle-small {
+    color: #00B4D8;
+    /* Example cyan color from design */
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.section-title-large {
+    font-size: 2rem;
+    color: #1a1a1a;
+    max-width: 700px;
+    margin: 0 auto 50px;
+    line-height: 1.3;
+}
+
+.agents-grid-view {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.agent-card-public {
+    background: transparent;
+    text-align: center;
+    width: 220px;
+    /* Fixed width for better alignment */
+    transition: transform 0.3s ease;
+}
+
+.agent-card-public:hover {
+    transform: translateY(-5px);
+}
+
+.agent-image-wrapper {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    /* transition: box-shadow 0.3s ease; */
+}
+
+/* Hover effect on standard card */
+.agent-card-public:hover .agent-image-wrapper {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Featured Agent styling (optional, based on design having one card with shadow/white bg) 
+   We can make the hovering card look like the "Sherief El Arafa" card in design */
+.agent-card-public:hover {
+    /* For the specific "card" look on hover if desired, 
+       we might need a wrapper div for padding/bg */
+}
+
+.agent-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.agent-photo-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #E2E8F0;
+    color: #64748B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.agent-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 5px;
+}
+
+.agent-role {
+    font-size: 0.9rem;
+    color: #64748B;
+    margin-bottom: 15px;
+}
+
+.agent-social {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 15px;
+    opacity: 0;
+    /* Hidden by default, shown on hover/active or always visible? Design shows only for active card */
+    transition: opacity 0.3s ease;
+}
+
+.agent-card-public:hover .agent-social {
+    opacity: 1;
+}
+
+.social-icon {
+    color: #94A3B8;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.social-icon:hover {
+    color: #00B4D8;
+}
+
+/* --- Carousel Styles --- */
+.agents-carousel-wrapper {
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+    overflow: hidden;
+    padding: 20px 40px;
+    /* Space for buttons */
+}
+
+.agents-carousel-track-container {
+    overflow: hidden;
+    width: 100%;
+}
+
+.agents-carousel-track {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    transition: transform 0.5s ease-in-out;
+    gap: 20px;
+}
+
+.agents-carousel-slide {
+    flex: 0 0 auto;
+    /* Don't shrink */
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    border: 1px solid #E2E8F0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748B;
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.carousel-btn:hover {
+    background: #00B4D8;
+    color: #fff;
+    border-color: #00B4D8;
+}
+
+.prev-btn {
+    left: 0;
+}
+
+.next-btn {
+    right: 0;
+}
+
+@media (max-width: 768px) {
+    .section-title-large {
+        font-size: 1.5rem;
+    }
+
+    .carousel-btn {
+        width: 30px;
+        height: 30px;
+    }
+
+    .agents-carousel-wrapper {
+        padding: 20px 30px;
+    }
+}
+
+
+/* --- Agent Profile Page --- */
+.agent-profile-section {
+    background-color: #fff;
+}
+
+.agent-profile-grid {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 60px;
+    align-items: start;
+    padding-top: 20px;
+}
+
+.agent-profile-left {
+    position: relative;
+    width: 100%;
+}
+
+.profile-image-container {
+    width: 100%;
+    /* aspect-ratio: 1/1; */
+    height: 400px;
+    /* Fixed height based on design */
+    overflow: hidden;
+    border-radius: 4px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.profile-agent-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+}
+
+.profile-agent-photo-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #E2E8F0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    color: #94A3B8;
+}
+
+.agent-profile-right {
+    padding-top: 0;
+    /* Align with top of image */
+}
+
+.profile-agent-name {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.profile-agent-role {
+    font-size: 1.1rem;
+    color: #64748B;
+    margin-bottom: 25px;
+    font-weight: 500;
+}
+
+.profile-agent-company {
+    color: #64748B;
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+}
+
+.profile-agent-company strong {
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.profile-agent-description {
+    color: #64748B;
+    line-height: 1.7;
+    margin-bottom: 40px;
+    font-size: 0.95rem;
+}
+
+.profile-contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+    border-top: 1px solid #eee;
+    padding-top: 30px;
+}
+
+.contact-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-label {
+    font-size: 0.9rem;
+    color: #64748B;
+    /* Lighter color for label */
+    margin-bottom: 5px;
+    font-weight: 400;
+}
+
+.contact-value {
+    font-size: 1rem;
+    font-weight: 700;
+    /* Bold value */
+    color: #1a1a1a;
+}
+
+.contact-value a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.contact-value a:hover {
+    color: #00B4D8;
+}
+
+.profile-divider {
+    border: 0;
+    border-top: 1px solid #E2E8F0;
+    margin-bottom: 30px;
+}
+
+.profile-footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.agent-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    /* Tight gap for stars */
+}
+
+.agent-rating .fa-star {
+    font-size: 0.9rem;
+}
+
+.review-count {
+    color: #94A3B8;
+    font-size: 0.9rem;
+    margin-left: 10px;
+    font-weight: 400;
+}
+
+.profile-social-links {
+    display: flex;
+    gap: 10px;
+}
+
+.profile-social-icon {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #E2E8F0;
+    border-radius: 2px;
+    /* Slight radius */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.profile-social-icon:hover {
+    background-color: #fff;
+    border-color: #00B4D8;
+    color: #00B4D8;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .agent-profile-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .profile-image-container {
+        max-width: 500px;
+        margin: 0 auto;
+        height: auto;
+        aspect-ratio: 3/4;
+    }
+
+    .profile-contact-grid {
+        grid-template-columns: 1fr;
+        /* Stack on small screens if needed, or keep 2 cols */
+        gap: 20px;
+    }
+}

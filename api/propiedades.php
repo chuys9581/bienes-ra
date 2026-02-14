@@ -28,7 +28,7 @@ try {
     if ($method === 'GET') {
         if (isset($_GET['id'])) {
             // Get Single
-            $result = $propiedad->getById($_GET['id']);
+            $result = $propiedad->getSingle($_GET['id']);
             if ($result) {
                 $response = ['success' => true, 'data' => $result];
             } else {
@@ -42,6 +42,8 @@ try {
                 'estado_propiedad' => $_GET['estado_propiedad'] ?? null,
                 'destacada' => $_GET['destacada'] ?? null,
                 'en_carousel' => $_GET['en_carousel'] ?? null,
+                'mejor_venta' => $_GET['mejor_venta'] ?? null,
+                'mejor_renta' => $_GET['mejor_renta'] ?? null,
                 'limit' => $_GET['limit'] ?? null
             ];
             
@@ -62,86 +64,87 @@ try {
             }
         }
     } elseif ($method === 'POST') {
-        // Check if it's an update (method override or just logic)
-        // We'll support both raw POST for create and POST with 'id' or _method for update if needed.
-        // For simplicity: If 'id' is in $_GET or $_POST, treat as Update, else Create.
         
-        $data = $_POST;
-        $id = isset($_GET['id']) ? $_GET['id'] : (isset($data['id']) ? $data['id'] : null);
-        
-        // Handle File Upload to Cloudinary
-        if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+        $action = isset($_GET['action']) ? $_GET['action'] : null;
+
+        if ($action === 'delete_image') {
+            // Delete specific image
+            $data = json_decode(file_get_contents("php://input"));
+            $imageId = isset($data->image_id) ? $data->image_id : null;
+
+            if ($imageId) {
+                if ($propiedad->deleteImage($imageId)) {
+                    $response = ['success' => true, 'message' => 'Imagen eliminada'];
+                } else {
+                    $response = ['success' => false, 'message' => 'Error al eliminar imagen'];
+                }
+            } else {
+                $response = ['success' => false, 'message' => 'ID de imagen no proporcionado'];
+            }
+
+        } else {
+            // Create or Update Property
+            $data = $_POST;
+            $id = isset($_GET['id']) ? $_GET['id'] : (isset($data['id']) ? $data['id'] : null);
+            
+            // Cloudinary Config
             $cloudName = 'dglemuw3c'; 
-            $uploadPreset = 'ml_default'; // Using unsigned upload or signed? 
-            // Since user gave API Key/Secret, let's do signed upload via CURL for security/robustness
-            // OR simple unsigned if preset exists. 
-            // Given we have Key/Secret, let's try a robust upload using API.
-            
-            $fileTmpPath = $_FILES['imagen']['tmp_name'];
-            
-            // Cloudinary API URL
-            $cloudinaryUrl = "https://api.cloudinary.com/v1_1/$cloudName/image/upload";
-            
-            $postFields = [
-                'file' => new CURLFile($fileTmpPath),
-                'upload_preset' => 'unsigned_preset', // If we don't know preset, we might need one.
-                // Fallback: If user didn't give preset, we use API Key/Secret for signed upload?
-                // Signed upload is complex without a library.
-                // Let's assume we can use the API Key/Secret for Basic Auth or similar?
-                // Actually, simplest is "unsigned" but we need a preset.
-                // As we don't have a preset, let's try to use the API Key/Secret to sign?
-                // Too complex for single file. 
-                // BETTER APPROACH: Use the user's API Key and Secret.
-            ];
-            
-            // Timestamp and Signature calculation for Signed Upload
-            $timestamp = time();
             $apiKey = '464125266981415';
             $apiSecret = '4E8o3GGpHktPm0hzTGsE0qOubn4';
-            
-            $signatureParams = "timestamp=$timestamp$apiSecret";
-            $signature = sha1($signatureParams);
-            
-            $postFields = [
-                'file' => new CURLFile($fileTmpPath),
-                'api_key' => $apiKey,
-                'timestamp' => $timestamp,
-                'signature' => $signature
-            ];
+            $cloudinaryUrl = "https://api.cloudinary.com/v1_1/$cloudName/image/upload";
 
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $cloudinaryUrl);
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            
-            $cloudRes = curl_exec($ch);
-            curl_close($ch);
-            
-            $cloudData = json_decode($cloudRes, true);
-            
-            if (isset($cloudData['secure_url'])) {
-                $data['imagen_principal'] = $cloudData['secure_url'];
+            $uploadedImages = [];
+            $mainImageUrl = null;
+
+            // Handle Single File (Old compatibility or specific field)
+            if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+                $imageUrl = uploadToCloudinary($_FILES['imagen']['tmp_name'], $cloudinaryUrl, $apiKey, $apiSecret);
+                if ($imageUrl) {
+                    $data['imagen_principal'] = $imageUrl;
+                    $mainImageUrl = $imageUrl;
+                }
             }
-        }
-        
-        if ($id) {
-            // Update
-            // If no new image, we might need to keep old one. 
-            // The frontend should send the old URL if no new file is selected, OR we fetch it.
-            // For simplicity, if image not uploaded, keep what's in 'imagen_principal' from POST body.
             
-            if ($propiedad->update($id, $data)) {
-                $response = ['success' => true, 'message' => 'Propiedad actualizada'];
-            } else {
-                $response = ['success' => false, 'message' => 'Error al actualizar'];
+            // Handle Multiple Files (imagenes[])
+            // Note: PHP structure for multiple files is $_FILES['imagenes']['name'][i], etc.
+            if (isset($_FILES['imagenes'])) {
+                $fileCount = count($_FILES['imagenes']['name']);
+                for ($i = 0; $i < $fileCount; $i++) {
+                    if ($_FILES['imagenes']['error'][$i] === UPLOAD_ERR_OK) {
+                        $tmpPath = $_FILES['imagenes']['tmp_name'][$i];
+                        $url = uploadToCloudinary($tmpPath, $cloudinaryUrl, $apiKey, $apiSecret);
+                        if ($url) {
+                            $uploadedImages[] = $url;
+                        }
+                    }
+                }
             }
-        } else {
-            // Create
-            if ($propiedad->create($data)) {
-                $response = ['success' => true, 'message' => 'Propiedad creada'];
+
+            // If main image was set via single file upload, ensure it's in the list too if we want (optional)
+            // But requirement says "first is main".
+            // If user uploaded via 'imagenes[]', take the first one as main IF main not already set.
+            
+            if (empty($data['imagen_principal']) && !empty($uploadedImages)) {
+                $data['imagen_principal'] = $uploadedImages[0];
+            }
+            
+            // Pass all new images to model
+            $data['imagenes'] = $uploadedImages;
+            
+            if ($id) {
+                // Update
+                if ($propiedad->update($id, $data)) {
+                    $response = ['success' => true, 'message' => 'Propiedad actualizada'];
+                } else {
+                    $response = ['success' => false, 'message' => 'Error al actualizar'];
+                }
             } else {
-                $response = ['success' => false, 'message' => 'Error al crear'];
+                // Create
+                if ($propiedad->create($data)) {
+                    $response = ['success' => true, 'message' => 'Propiedad creada'];
+                } else {
+                    $response = ['success' => false, 'message' => 'Error al crear'];
+                }
             }
         }
         
@@ -166,3 +169,34 @@ try {
 }
 
 echo json_encode($response);
+
+// Helper function
+function uploadToCloudinary($filePath, $url, $apiKey, $apiSecret) {
+     $timestamp = time();
+     $signatureParams = "timestamp=$timestamp$apiSecret";
+     $signature = sha1($signatureParams);
+    
+    $postFields = [
+        'file' => new CURLFile($filePath),
+        'api_key' => $apiKey,
+        'timestamp' => $timestamp,
+        'signature' => $signature
+    ];
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+    $cloudRes = curl_exec($ch);
+    curl_close($ch);
+    
+    $cloudData = json_decode($cloudRes, true);
+    
+    if (isset($cloudData['secure_url'])) {
+        return $cloudData['secure_url'];
+    }
+    return null;
+}
+?>

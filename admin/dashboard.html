@@ -11,106 +11,117 @@
 </head>
 
 <body>
-    <div class="admin-layout">
-        <!-- Sidebar -->
-        <aside class="admin-sidebar">
-            <div class="sidebar-logo">
-                <span class="material-icons">home</span>
-                <h2>Inmobiliaria Elite</h2>
+    <div class="admin-container">
+        <!-- 1. LEFT SIDEBAR -->
+        <aside class="sidebar-left">
+            <div class="sidebar-header">
+                <div class="logo-icon" id="sidebarLogoIcon">eP</div>
+                <h2 id="sidebarCompanyName">eProduct</h2>
             </div>
 
-            <nav>
-                <ul class="sidebar-menu">
-                    <li class="menu-item">
-                        <a href="#" class="active" data-section="dashboard">
-                            <span class="material-icons">dashboard</span>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="#agentes" data-section="agentes">
-                            <span class="material-icons">people</span>
-                            <span>Agentes</span>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="#estadisticas" data-section="estadisticas">
-                            <span class="material-icons">analytics</span>
-                            <span>Estadísticas</span>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="../index.html" target="_blank">
-                            <span class="material-icons">public</span>
-                            <span>Ver Sitio Público</span>
-                        </a>
-                    </li>
-                </ul>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <span class="material-icons">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-section="propiedades">
+                    <span class="material-icons">home_work</span>
+                    <span>Propiedades</span>
+                </a>
+                <a href="#" class="nav-item" data-section="agentes">
+                    <span class="material-icons">people</span>
+                    <span>Agentes</span>
+                </a>
+
+                <a href="#" class="nav-item mt-auto" data-section="configuracion">
+                    <span class="material-icons">settings</span>
+                    <span>Configuración</span>
+                </a>
             </nav>
+
+            <div class="sidebar-footer">
+                <a href="#" class="footer-link">Ayuda</a>
+                <a href="#" class="footer-link">Contacto</a>
+            </div>
         </aside>
 
-        <!-- Header -->
-        <header class="admin-header">
-            <div class="header-search">
-                <span class="material-icons">search</span>
-                <input type="text" id="searchInput" placeholder="Buscar...">
-            </div>
-
-            <div class="header-actions">
-                <div class="user-info">
-                    <div class="user-avatar" id="userAvatar">A</div>
-                    <div class="user-details">
-                        <div class="user-name" id="userName">Cargando...</div>
-                        <div class="user-role" id="userRole">-</div>
-                    </div>
+        <!-- 2. MAIN CONTENT -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-header">
+                <div class="header-titles">
+                    <h1>Hola, <span id="userNameHeader">Admin</span> 👋</h1>
+                    <p>Bienvenido de nuevo a tu panel.</p>
                 </div>
-
-                <button class="btn-logout" id="btnLogout">
-                    <span class="material-icons">logout</span>
-                    Salir
-                </button>
-            </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="admin-main">
-            <!-- ==================== DASHBOARD SECTION ==================== -->
-            <section id="sectionDashboard" class="admin-section active">
-                <div class="page-header">
-                    <h1 class="page-title">Inventario de Propiedades</h1>
-                    <button class="btn-success" id="btnAddProperty">
-                        <span class="material-icons">add</span>
-                        Agregar Propiedad
+                <div class="header-actions">
+                    <div class="search-bar">
+                        <span class="material-icons">search</span>
+                        <input type="text" placeholder="Search..." id="searchInput">
+                    </div>
+                    <button class="btn-icon">
+                        <span class="material-icons">notifications</span>
+                        <span class="notification-dot"></span>
                     </button>
                 </div>
+            </header>
 
-                <div class="properties-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Propiedad</th>
-                                <th>Tipo</th>
-                                <th>Precio</th>
-                                <th>Estado</th>
-                                <th>Destacada</th>
-                                <th>En Carrusel</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="propertiesTableBody">
-                            <tr>
-                                <td colspan="8" style="text-align: center; padding: 2rem; color: #64748B;">
-                                    Cargando propiedades...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <!-- Dashboard Content (GRAPHS) -->
+            <div id="sectionDashboard" class="content-section active">
+                <div class="charts-grid"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;">
+                    <!-- Graph 1: Properties by Status -->
+                    <div class="card-wide" style="min-height: 400px;">
+                        <h3>Propiedades por Estado</h3>
+                        <div style="position: relative; height: 300px; width: 100%;">
+                            <canvas id="propiedadesChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Graph 2: Properties by Agent -->
+                    <div class="card-wide" style="min-height: 400px;">
+                        <h3>Propiedades por Agente</h3>
+                        <div style="position: relative; height: 300px; width: 100%;">
+                            <canvas id="agentesChart"></canvas>
+                        </div>
+                    </div>
                 </div>
-            </section>
+            </div>
 
-            <!-- ==================== AGENTES SECTION ==================== -->
-            <section id="sectionAgentes" class="admin-section">
+            <!-- Propiedades Content (TABLE MOVED HERE) -->
+            <div id="sectionPropiedades" class="content-section">
+                <div class="bottom-grid" style="grid-template-columns: 1fr;">
+                    <!-- Properties Table -->
+                    <div class="card-wide">
+                        <div class="card-header-flex">
+                            <h3>Inventario de Propiedades</h3>
+                            <button class="btn-success-sm" id="btnAddProperty">
+                                <span class="material-icons">add</span>
+                            </button>
+                        </div>
+                        <div class="properties-table-container">
+                            <table class="clean-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Propiedad</th>
+                                        <th>Precio</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="propertiesTableBody">
+                                    <tr>
+                                        <td colspan="5">Cargando...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agents Content -->
+            <div id="sectionAgentes" class="content-section">
                 <div class="page-header">
                     <h1 class="page-title">Gestión de Agentes</h1>
                     <button class="btn-success" id="btnAddAgent">
@@ -118,15 +129,87 @@
                         Agregar Agente
                     </button>
                 </div>
+                <div class="agents-grid" id="agentsGrid"></div>
+            </div>
 
-                <div class="agents-grid" id="agentsGrid">
-                    <div class="loading-placeholder">
-                        <span class="material-icons" style="font-size:3rem;color:#64748B;">people</span>
-                        <p>Cargando agentes...</p>
-                    </div>
+            <!-- Configuración Content -->
+            <div id="sectionConfiguracion" class="content-section">
+                <div class="page-header">
+                    <h1 class="page-title">Configuración</h1>
                 </div>
-            </section>
+                <div class="card-wide" style="max-width: 600px;">
+                    <form id="configForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="configCompanyName">Nombre de la Empresa</label>
+                                <input type="text" id="configCompanyName" class="form-input" placeholder="Ej: eProduct"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label for="configCompanyIconFile">Icono / Logo (Imagen)</label>
+                                <input type="file" id="configCompanyIconFile" class="form-input" accept="image/*">
+                                <div id="currentIconPreview" style="margin-top: 0.5rem;"></div>
+                                <small style="display:block; margin-top:0.5rem; color:#6B7280;">Suba una imagen para el
+                                    icono del menú.</small>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1.5rem;">
+                            <button type="submit" class="btn-success" style="padding: 0.75rem 1.5rem;">Guardar
+                                Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </main>
+
+        <!-- 3. RIGHT SIDEBAR -->
+        <aside class="right-sidebar">
+            <div class="search-icon-mobile">
+                <span class="material-icons">search</span>
+            </div>
+
+            <div class="user-profile-widget">
+                <div class="user-avatar-large" id="userAvatar">A</div>
+                <h3 id="userName">User Name</h3>
+                <p id="userRole">Admin</p>
+                <span class="user-level-badge">Level 1</span>
+            </div>
+
+            <div class="stats-widgets">
+                <div class="stat-item">
+                    <span class="stat-num" id="totalPropiedades">0</span>
+                    <span class="stat-label">Propiedades</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num" id="totalAgentes">0</span>
+                    <span class="stat-label">Agentes</span>
+                </div>
+            </div>
+
+            <div class="perf-item">
+                <div class="perf-icon bg-blue-light"><span class="material-icons">trending_up</span></div>
+                <div class="perf-info">
+                    <span class="perf-value" id="propGrowthVal">0%</span>
+                    <span class="perf-label">Crecimiento Propiedades</span>
+                </div>
+            </div>
+
+            <div class="perf-item">
+                <div class="perf-icon bg-pink-light"><span class="material-icons">group_add</span></div>
+                <div class="perf-info">
+                    <span class="perf-value" id="agentGrowthVal">0%</span>
+                    <span class="perf-label">Crecimiento Agentes</span>
+                </div>
+            </div>
+
+            <div class="logout-area">
+                <button class="btn-logout-full" id="btnLogout">
+                    <span class="material-icons">logout</span>
+                    Salir
+                </button>
+            </div>
+    </div>
+    </aside>
     </div>
 
     <!-- ==================== MODAL: Agregar/Editar Propiedad ==================== -->
@@ -243,17 +326,22 @@
                                 <input type="checkbox" id="mejor_venta">
                                 <span>Mejor Venta</span>
                             </label>
+                            <label
+                                style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-top: 0.5rem;">
+                                <input type="checkbox" id="mejor_renta">
+                                <span>Mejor Renta</span>
+                            </label>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Imagen Principal</label>
-                            <div id="imagePreviewContainer" style="margin-bottom: 10px; display: none;">
-                                <img id="currentImagePreview" src="" alt="Vista previa"
-                                    style="max-width: 100%; max-height: 200px; border-radius: 8px; object-fit: cover;">
+                            <label>Imágenes (Máx 6)</label>
+                            <div id="imagePreviewContainer"
+                                style="margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 10px;">
+                                <!-- Thumbnails will be injected here -->
                             </div>
-                            <input type="file" id="imagen_file" accept="image/*">
+                            <input type="file" id="imagen_file" multiple accept="image/*">
                             <input type="hidden" id="imagen_principal">
                         </div>
                     </div>
@@ -291,6 +379,14 @@
                         <div class="form-group">
                             <label>Apellido</label>
                             <input type="text" id="agentApellido" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Imagen de Perfil</label>
+                            <input type="file" id="agentImagen" accept="image/*">
+                            <input type="hidden" id="agentImagenUrl">
                         </div>
                     </div>
 
@@ -367,7 +463,7 @@
 
     <!-- Success Modal -->
     <div id="successModal" class="modal modal-success" style="display: none;">
-        <div class="modal-content">
+        <div class="modal-content modal-sm">
             <div class="success-icon">
                 <span class="material-icons">check</span>
             </div>
@@ -379,19 +475,22 @@
 
     <!-- Confirmation Modal -->
     <div id="confirmationModal" class="modal modal-danger" style="display: none;">
-        <div class="modal-content">
+        <div class="modal-content modal-sm">
             <div class="success-icon">
                 <span class="material-icons">warning</span>
             </div>
             <h2 class="success-title" id="confirmTitle">¿Estás seguro?</h2>
             <p class="success-message" id="confirmMessage">Esta acción no se puede deshacer.</p>
-            <div class="modal-actions-row">
-                <button class="btn-cancel-modal" id="btnConfirmCancel">Cancelar</button>
-                <button class="btn-danger-modal" id="btnConfirmAction">Eliminar</button>
+            <div class="modal-actions" style="justify-content: center; gap: 1rem;">
+                <button class="btn-secondary" id="btnConfirmCancel" style="width: 50%;">Cancelar</button>
+                <button class="btn-danger" id="btnConfirmAction"
+                    style="width: 50%; background: #EF4444; color: white;">Eliminar</button>
             </div>
         </div>
     </div>
 
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="admin.js"></script>
 </body>
 

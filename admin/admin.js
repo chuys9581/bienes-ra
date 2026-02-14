@@ -11,9 +11,11 @@ let editingAgentId = null;
 let currentAssignAgentId = null;
 
 // ==================== INIT ====================
+// ==================== INIT ====================
 window.addEventListener('DOMContentLoaded', async () => {
     await checkAuth();
     loadProperties();
+    loadAgentes(); // Load agents for stats/charts
     initNavigation();
 });
 
@@ -31,10 +33,21 @@ async function checkAuth() {
 }
 
 function updateUserInfo() {
-    document.getElementById('userName').textContent = currentUser.nombre;
-    document.getElementById('userRole').textContent = currentUser.rol;
+    // Header
+    const headerName = document.getElementById('userNameHeader');
+    if (headerName) headerName.textContent = currentUser.nombre;
+
+    // Right Sidebar
+    const profileName = document.getElementById('userName');
+    if (profileName) profileName.textContent = currentUser.nombre;
+
+    const profileRole = document.getElementById('userRole');
+    if (profileRole) profileRole.textContent = currentUser.rol;
+
     const initials = currentUser.nombre.split(' ').map(n => n[0]).join('').substring(0, 2);
-    document.getElementById('userAvatar').textContent = initials.toUpperCase();
+    // There is a big avatar in right sidebar
+    const avatarEl = document.getElementById('userAvatar');
+    if (avatarEl) avatarEl.textContent = initials.toUpperCase();
 }
 
 document.getElementById('btnLogout').addEventListener('click', async () => {
@@ -46,9 +59,19 @@ document.getElementById('btnLogout').addEventListener('click', async () => {
     }
 });
 
+// ==================== STATS UI ====================
+function updateDashboardStats() {
+    const propCount = document.getElementById('totalPropiedades');
+    const agentCount = document.getElementById('totalAgentes');
+
+    if (propCount) propCount.textContent = propiedades.length;
+    if (agentCount) agentCount.textContent = agentes.length;
+}
+
 // ==================== NAVIGATION ====================
 function initNavigation() {
-    const menuLinks = document.querySelectorAll('.sidebar-menu a[data-section]');
+    // New selector: .sidebar-nav a[data-section]
+    const menuLinks = document.querySelectorAll('.sidebar-nav a[data-section]');
     menuLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -66,27 +89,133 @@ function initNavigation() {
 
 function switchSection(sectionName) {
     // Update sidebar active
-    document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
-    const activeLink = document.querySelector(`a[data-section="${sectionName}"]`);
+    document.querySelectorAll('.sidebar-nav .nav-item').forEach(a => a.classList.remove('active'));
+    const activeLink = document.querySelector(`.sidebar-nav a[data-section="${sectionName}"]`);
     if (activeLink) activeLink.classList.add('active');
 
     // Toggle sections
-    document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+
+    const searchInput = document.getElementById('searchInput');
 
     if (sectionName === 'agentes') {
-        document.getElementById('sectionAgentes').classList.add('active');
+        const agSection = document.getElementById('sectionAgentes');
+        if (agSection) agSection.classList.add('active');
         loadAgentes();
-        document.getElementById('searchInput').placeholder = 'Buscar agentes...';
+        if (searchInput) searchInput.placeholder = 'Buscar agentes...';
+    } else if (sectionName === 'propiedades') {
+        const propSection = document.getElementById('sectionPropiedades');
+        if (propSection) propSection.classList.add('active');
+        // Ideally reload properties if needed, but we load on startup
+        renderProperties(propiedades);
+        if (searchInput) searchInput.placeholder = 'Buscar propiedad...';
+    } else if (sectionName === 'configuracion') {
+        const configSection = document.getElementById('sectionConfiguracion');
+        if (configSection) configSection.classList.add('active');
+        if (searchInput) searchInput.placeholder = 'Configuración';
+
+        // Load values into form
+        const storedName = localStorage.getItem('companyName') || 'eProduct';
+        const storedIcon = localStorage.getItem('companyIcon') || 'eP';
+
+        const nameInput = document.getElementById('configCompanyName');
+        if (nameInput) nameInput.value = storedName;
+
+        // Show preview
+        const preview = document.getElementById('currentIconPreview');
+        if (preview) {
+            if (storedIcon.startsWith('http')) {
+                preview.innerHTML = `<p>Icono actual:</p><img src="${storedIcon}" style="height:50px; border-radius:8px; margin-top:5px;">`;
+            } else {
+                preview.innerHTML = `<p>Icono actual: <strong>${storedIcon}</strong></p>`;
+            }
+        }
     } else {
-        document.getElementById('sectionDashboard').classList.add('active');
-        document.getElementById('searchInput').placeholder = 'Buscar propiedades...';
+        // Dashboard
+        const dashSection = document.getElementById('sectionDashboard');
+        if (dashSection) dashSection.classList.add('active');
+        renderCharts();
+        if (searchInput) searchInput.placeholder = 'Buscar...';
+    }
+}
+
+// ==================== CHARTS ====================
+let propChartInstance = null;
+let agentChartInstance = null;
+
+function renderCharts() {
+    // Update Sidebar Stats
+    updateDashboardStats();
+
+    // Wait for data
+    if (!propiedades.length && !agentes.length) return;
+
+    // 1. Properties by Status
+    const statusCounts = propiedades.reduce((acc, curr) => {
+        const status = curr.estado_propiedad || 'Desconocido';
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+    }, {});
+
+    const ctxProp = document.getElementById('propiedadesChart');
+    if (ctxProp) {
+        if (propChartInstance) propChartInstance.destroy();
+        propChartInstance = new Chart(ctxProp, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(statusCounts).map(s => s.toUpperCase()),
+                datasets: [{
+                    data: Object.values(statusCounts),
+                    backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right' }
+                }
+            }
+        });
+    }
+
+    // 2. Agents Performance (Properties count)
+    // We rely on 'total_propiedades' from agents data or calculate from properties list if needed.
+    // Assuming backend returns 'total_propiedades' in agents list as seen in renderAgentes
+    const agentNames = agentes.map(a => a.nombre);
+    const agentCounts = agentes.map(a => a.total_propiedades || 0);
+
+    const ctxAgent = document.getElementById('agentesChart');
+    if (ctxAgent) {
+        if (agentChartInstance) agentChartInstance.destroy();
+        agentChartInstance = new Chart(ctxAgent, {
+            type: 'bar',
+            data: {
+                labels: agentNames,
+                datasets: [{
+                    label: 'Propiedades Asignadas',
+                    data: agentCounts,
+                    backgroundColor: '#3B82F6',
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
     }
 }
 
 // ==================== SEARCH ====================
 document.getElementById('searchInput').addEventListener('input', (e) => {
     const term = e.target.value.toLowerCase();
-    const activeSection = document.querySelector('.admin-section.active');
+    const activeSection = document.querySelector('.content-section.active');
 
     if (activeSection && activeSection.id === 'sectionAgentes') {
         const filtered = agentes.filter(a =>
@@ -116,6 +245,7 @@ async function loadProperties() {
         if (data.success) {
             propiedades = data.data;
             renderProperties(propiedades);
+            renderCharts(); // Update charts
         }
     } catch (error) {
         console.error('Error cargando propiedades:', error);
@@ -129,10 +259,35 @@ async function loadProperties() {
     }
 }
 
+// ... [omitted renderProperties] ...
+
+// ============================================================
+//  AGENTES
+// ============================================================
+
+async function loadAgentes() {
+    try {
+        const response = await fetch(`${API_URL}/agentes.php`);
+        const data = await response.json();
+        if (data.success) {
+            agentes = data.data;
+            renderAgentes(agentes);
+            renderCharts(); // Update charts
+        }
+    } catch (error) {
+        console.error('Error cargando agentes:', error);
+        document.getElementById('agentsGrid').innerHTML = `
+            <div class="loading-placeholder" style="color:#EF4444;">
+                <span class="material-icons" style="font-size:3rem;">error</span>
+                <p>Error al cargar agentes</p>
+            </div>`;
+    }
+}
+
 function renderProperties(props) {
     const tbody = document.getElementById('propertiesTableBody');
     if (props.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 2rem; color: #64748B;">No hay propiedades registradas</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; padding: 2rem; color: #64748B;">No hay propiedades registradas</td></tr>`;
         return;
     }
     tbody.innerHTML = props.map(prop => `
@@ -147,6 +302,8 @@ function renderProperties(props) {
             <td><span class="status-badge status-${prop.estado_propiedad}">${prop.estado_propiedad}</span></td>
             <td>${prop.destacada == 1 ? '<span class="material-icons" style="color: #F59E0B;">star</span>' : '-'}</td>
             <td>${prop.en_carousel == 1 ? '<span class="material-icons" style="color: #10B981;">check_circle</span>' : '-'}</td>
+            <td>${prop.mejor_venta == 1 ? '<span class="material-icons" style="color: #10B981;">check_circle</span>' : '-'}</td>
+            <td>${prop.mejor_renta == 1 ? '<span class="material-icons" style="color: #10B981;">check_circle</span>' : '-'}</td>
             <td>
                 <div class="action-buttons">
                     <button class="btn-icon edit" onclick="editProperty(${prop.id})"><span class="material-icons">edit</span></button>
@@ -191,26 +348,80 @@ function openModal(property = null) {
         document.getElementById('destacada').checked = property.destacada == 1;
         document.getElementById('en_carousel').checked = property.en_carousel == 1;
         document.getElementById('mejor_venta').checked = property.mejor_venta == 1;
+        document.getElementById('mejor_renta').checked = property.mejor_renta == 1;
         document.getElementById('imagen_principal').value = property.imagen_principal || '';
     } else {
         propertyForm.reset();
     }
 
     // Image preview
-    if (property && property.imagen_principal) {
-        const previewContainer = document.getElementById('imagePreviewContainer');
-        const previewImg = document.getElementById('currentImagePreview');
-        const src = property.imagen_principal.startsWith('http')
-            ? property.imagen_principal
-            : `${API_URL}/imagenes/${property.imagen_principal}`;
-        previewImg.src = src;
-        previewContainer.style.display = 'block';
-    } else {
-        document.getElementById('imagePreviewContainer').style.display = 'none';
-        if (!property) {
-            propertyForm.reset();
-            document.getElementById('propertyId').value = '';
+    const previewContainer = document.getElementById('imagePreviewContainer');
+    previewContainer.innerHTML = ''; // Clear prev
+
+    if (property && property.imagenes && property.imagenes.length > 0) {
+        property.imagenes.forEach(img => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'img-preview-wrapper';
+            wrapper.style.position = 'relative';
+            wrapper.style.width = '100px';
+            wrapper.style.height = '100px';
+
+            const imgEl = document.createElement('img');
+            imgEl.src = img.url_imagen;
+            imgEl.style.width = '100%';
+            imgEl.style.height = '100%';
+            imgEl.style.objectFit = 'cover';
+            imgEl.style.borderRadius = '4px';
+
+            const btnDel = document.createElement('button');
+            btnDel.innerHTML = '<span class="material-icons" style="font-size:16px;">close</span>';
+            btnDel.style.position = 'absolute';
+            btnDel.style.top = '-5px';
+            btnDel.style.right = '-5px';
+            btnDel.style.background = '#EF4444';
+            btnDel.style.color = 'white';
+            btnDel.style.border = 'none';
+            btnDel.style.borderRadius = '50%';
+            btnDel.style.width = '20px';
+            btnDel.style.height = '20px';
+            btnDel.style.cursor = 'pointer';
+            btnDel.style.display = 'flex';
+            btnDel.style.alignItems = 'center';
+            btnDel.style.justifyContent = 'center';
+
+            btnDel.onclick = (e) => {
+                e.preventDefault();
+                deleteImage(img.id, wrapper);
+            };
+
+            wrapper.appendChild(imgEl);
+            wrapper.appendChild(btnDel);
+            previewContainer.appendChild(wrapper);
+        });
+        previewContainer.style.display = 'flex';
+    } else if (property && property.imagen_principal) {
+        // Fallback for old single image if not in array
+        // But logic says we should migrate or handle.
+        // Let's just show it if it exists and not in imagenes list
+        const alreadyShown = property.imagenes ? property.imagenes.some(i => i.url_imagen === property.imagen_principal) : false;
+
+        if (!alreadyShown && property.imagen_principal && !property.imagen_principal.startsWith('http://localhost')) {
+            // It allows showing legacy image
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = `<img src="${property.imagen_principal}" style="width:100px;height:100px;object-fit:cover;border-radius:4px;">`;
+            previewContainer.appendChild(wrapper);
+            previewContainer.style.display = 'flex';
         }
+    } else {
+        previewContainer.style.display = 'none';
+    }
+
+    // File input reset handled by form reset
+    if (!property) {
+        propertyForm.reset();
+        document.getElementById('propertyId').value = '';
+        previewContainer.style.display = 'none';
+        previewContainer.innerHTML = '';
     }
 
     modal.style.display = 'flex';
@@ -225,6 +436,26 @@ function closeModal() {
 window.editProperty = async function (id) {
     const property = propiedades.find(p => p.id == id);
     if (property) openModal(property);
+};
+
+window.deleteImage = async function (id, element) {
+    if (!confirm('¿Eliminar esta imagen?')) return;
+
+    try {
+        const response = await fetch(`${API_URL}/propiedades.php?action=delete_image`, {
+            method: 'POST',
+            body: JSON.stringify({ image_id: id })
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            element.remove();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        alert('Error al conectar con el servidor');
+    }
 };
 
 window.deleteProperty = async function (id) {
@@ -258,10 +489,13 @@ propertyForm.addEventListener('submit', async (e) => {
     formData.append('destacada', document.getElementById('destacada').checked ? 1 : 0);
     formData.append('en_carousel', document.getElementById('en_carousel').checked ? 1 : 0);
     formData.append('mejor_venta', document.getElementById('mejor_venta').checked ? 1 : 0);
+    formData.append('mejor_renta', document.getElementById('mejor_renta').checked ? 1 : 0);
 
     const fileInput = document.getElementById('imagen_file');
     if (fileInput.files.length > 0) {
-        formData.append('imagen', fileInput.files[0]);
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append('imagenes[]', fileInput.files[i]);
+        }
     } else {
         formData.append('imagen_principal', document.getElementById('imagen_principal').value);
     }
@@ -292,6 +526,7 @@ async function loadAgentes() {
         if (data.success) {
             agentes = data.data;
             renderAgentes(agentes);
+            renderCharts(); // Update charts
         }
     } catch (error) {
         console.error('Error cargando agentes:', error);
@@ -319,10 +554,14 @@ function renderAgentes(list) {
         const statusClass = agent.activo == 1 ? 'active' : 'inactive';
         const statusText = agent.activo == 1 ? 'Activo' : 'Inactivo';
 
+        const avatarContent = agent.imagen
+            ? `<img src="${agent.imagen}" alt="${agent.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+            : initials;
+
         return `
         <div class="agent-card" data-id="${agent.id}">
             <div class="agent-card-header">
-                <div class="agent-avatar">${initials}</div>
+                <div class="agent-avatar" style="${agent.imagen ? 'background:none;padding:0;' : ''}">${avatarContent}</div>
                 <div class="agent-info">
                     <h3 class="agent-name">${agent.nombre} ${agent.apellido}</h3>
                     <span class="agent-cargo">${agent.cargo || 'Sin cargo'}</span>
@@ -370,6 +609,7 @@ function openAgentModal(agent = null) {
         document.getElementById('agentTelefono').value = agent.telefono || '';
         document.getElementById('agentCargo').value = agent.cargo || '';
         document.getElementById('agentAntiguedad').value = agent.antiguedad || '';
+        document.getElementById('agentImagenUrl').value = agent.imagen || '';
         document.getElementById('agentActivo').checked = agent.activo == 1;
     } else {
         agentForm.reset();
@@ -406,23 +646,28 @@ window.deleteAgent = async function (id) {
 agentForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const payload = {
-        nombre: document.getElementById('agentNombre').value,
-        apellido: document.getElementById('agentApellido').value,
-        email: document.getElementById('agentEmail').value,
-        telefono: document.getElementById('agentTelefono').value,
-        cargo: document.getElementById('agentCargo').value,
-        antiguedad: document.getElementById('agentAntiguedad').value,
-        activo: document.getElementById('agentActivo').checked ? 1 : 0
-    };
+    const formData = new FormData();
+    formData.append('nombre', document.getElementById('agentNombre').value);
+    formData.append('apellido', document.getElementById('agentApellido').value);
+    formData.append('email', document.getElementById('agentEmail').value);
+    formData.append('telefono', document.getElementById('agentTelefono').value);
+    formData.append('cargo', document.getElementById('agentCargo').value);
+    formData.append('antiguedad', document.getElementById('agentAntiguedad').value);
+    formData.append('activo', document.getElementById('agentActivo').checked ? 1 : 0);
 
-    if (editingAgentId) payload.id = editingAgentId;
+    const fileInput = document.getElementById('agentImagen');
+    if (fileInput.files.length > 0) {
+        formData.append('imagen', fileInput.files[0]);
+    } else {
+        formData.append('imagen', document.getElementById('agentImagenUrl').value);
+    }
+
+    if (editingAgentId) formData.append('id', editingAgentId);
 
     try {
         const response = await fetch(`${API_URL}/agentes.php`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: formData // Send FormData instead of JSON
         });
         const data = await response.json();
 
@@ -546,6 +791,95 @@ function closeAssignModal() {
     currentAssignAgentId = null;
     loadAgentes(); // Refresh to update count
 }
+
+
+// ============================================================
+//  CONFIGURATION
+// ============================================================
+const configForm = document.getElementById('configForm');
+if (configForm) {
+    configForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = configForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Guardando...';
+
+        try {
+            const name = document.getElementById('configCompanyName').value;
+            const fileInput = document.getElementById('configCompanyIconFile');
+            let iconUrl = localStorage.getItem('companyIcon') || 'eP';
+
+            // Upload Image if selected
+            if (fileInput.files.length > 0) {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+
+                const res = await fetch(`${API_URL}/upload.php`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    iconUrl = data.url;
+                } else {
+                    alert('Error al subir imagen: ' + (data.message || 'Error desconocido'));
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                    return;
+                }
+            }
+
+            localStorage.setItem('companyName', name);
+            localStorage.setItem('companyIcon', iconUrl);
+
+            applyConfig();
+            showSuccessModal('Configuración guardada correctamente');
+
+        } catch (error) {
+            alert('Error: ' + error.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
+        }
+    });
+}
+
+function applyConfig() {
+    const name = localStorage.getItem('companyName') || 'eProduct';
+    const icon = localStorage.getItem('companyIcon') || 'eP';
+
+    // Update Company Name
+    const sidebarName = document.getElementById('sidebarCompanyName');
+    if (sidebarName) sidebarName.textContent = name;
+
+    // Update Icon
+    const sidebarIcon = document.getElementById('sidebarLogoIcon');
+    if (sidebarIcon) {
+        if (icon.startsWith('http')) {
+            // It's an image
+            sidebarIcon.innerHTML = `<img src="${icon}" alt="Logo" style="width:100%; height:100%; object-fit:contain;">`;
+            sidebarIcon.style.display = 'flex';
+            sidebarIcon.style.alignItems = 'center';
+            sidebarIcon.style.justifyContent = 'center';
+            sidebarIcon.style.background = 'transparent'; // Remove default background if image
+            sidebarIcon.style.padding = '0';
+        } else {
+            // It's text
+            sidebarIcon.textContent = icon;
+            sidebarIcon.style.background = ''; // Reset to CSS default
+            sidebarIcon.innerHTML = icon; // plaintext
+        }
+    }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    initNavigation();
+    loadProperties(); // Also loads charts initially
+    applyConfig(); // Apply saved settings
+});
 
 // ============================================================
 //  SHARED: Confirmation & Success Modals

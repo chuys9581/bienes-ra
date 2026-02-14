@@ -5,15 +5,11 @@ include_once 'api/config/Database.php';
 $database = new Database();
 $db = $database->connect();
 
-try {
-    $query = "DESCRIBE propiedades";
-    $stmt = $db->prepare($query);
-    $stmt->execute();
-    
-    while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        echo $row['Field'] . " - " . $row['Type'] . "\n";
-    }
-} catch(PDOException $e) {
-    echo "Error: " . $e->getMessage();
+echo "--- Table: agentes ---\n";
+$query = "DESCRIBE agentes";
+$stmt = $db->prepare($query);
+$stmt->execute();
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    print_r($row);
 }
 ?>

@@ -35,12 +35,16 @@ class Propiedad {
             $conditions[] = "p.mejor_venta = :mejor_venta";
             $params[':mejor_venta'] = $filters['mejor_venta'];
         }
+        if (isset($filters['mejor_renta'])) {
+            $conditions[] = "p.mejor_renta = :mejor_renta";
+            $params[':mejor_renta'] = $filters['mejor_renta'];
+        }
 
         if (count($conditions) > 0) {
             $query .= " WHERE " . implode(' AND ', $conditions);
         }
 
-        if (isset($filters['destacada']) || isset($filters['mejor_venta'])) {
+        if (isset($filters['destacada']) || isset($filters['mejor_venta']) || isset($filters['mejor_renta'])) {
             $query .= " ORDER BY p.updated_at DESC";
         } else {
             $query .= " ORDER BY p.created_at DESC";
@@ -75,7 +79,11 @@ class Propiedad {
         $stmt->bindParam(1, $id);
         $stmt->execute();
 
-        return $stmt->fetch();
+        $propiedad = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($propiedad) {
+            $propiedad['imagenes'] = $this->getImages($id);
+        }
+        return $propiedad;
     }
     public function create($data) {
         $query = "INSERT INTO " . $this->table . " 
@@ -94,6 +102,7 @@ class Propiedad {
                       destacada = :destacada,
                       en_carousel = :en_carousel,
                       mejor_venta = :mejor_venta,
+                      mejor_renta = :mejor_renta,
                       imagen_principal = :imagen_principal";
 
         $stmt = $this->conn->prepare($query);
@@ -102,6 +111,10 @@ class Propiedad {
         $this->bindParams($stmt, $data);
 
         if ($stmt->execute()) {
+            $lastId = $this->conn->lastInsertId();
+            if (isset($data['imagenes']) && is_array($data['imagenes'])) {
+                $this->addImages($lastId, $data['imagenes']);
+            }
             return true;
         }
         return false;
@@ -124,6 +137,7 @@ class Propiedad {
                       destacada = :destacada,
                       en_carousel = :en_carousel,
                       mejor_venta = :mejor_venta,
+                      mejor_renta = :mejor_renta,
                       imagen_principal = :imagen_principal
                   WHERE id = :id";
 
@@ -165,7 +179,37 @@ class Propiedad {
         $stmt->bindValue(':destacada', $data['destacada'], PDO::PARAM_BOOL);
         $stmt->bindValue(':en_carousel', isset($data['en_carousel']) ? $data['en_carousel'] : 0, PDO::PARAM_BOOL);
         $stmt->bindValue(':mejor_venta', isset($data['mejor_venta']) ? $data['mejor_venta'] : 0, PDO::PARAM_BOOL);
+        $stmt->bindValue(':mejor_renta', isset($data['mejor_renta']) ? $data['mejor_renta'] : 0, PDO::PARAM_BOOL);
         $stmt->bindValue(':imagen_principal', htmlspecialchars(strip_tags($data['imagen_principal'])));
+    }
+
+    public function addImages($propiedad_id, $images) {
+        if (empty($images)) return true;
+        
+        $query = "INSERT INTO propiedad_imagenes (propiedad_id, url_imagen) VALUES (:propiedad_id, :url_imagen)";
+        $stmt = $this->conn->prepare($query);
+
+        foreach ($images as $url) {
+            $stmt->bindValue(':propiedad_id', $propiedad_id);
+            $stmt->bindValue(':url_imagen', $url);
+            if (!$stmt->execute()) return false;
+        }
+        return true;
+    }
+
+    public function getImages($propiedad_id) {
+        $query = "SELECT * FROM propiedad_imagenes WHERE propiedad_id = :propiedad_id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(':propiedad_id', $propiedad_id);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    public function deleteImage($id) {
+        $query = "DELETE FROM propiedad_imagenes WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(':id', $id);
+        return $stmt->execute();
     }
 }
 ?>
