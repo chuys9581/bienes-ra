@@ -154,8 +154,10 @@
                             </div>
                         </div>
                         <div style="margin-top: 1.5rem;">
-                            <button type="submit" class="btn-success" style="padding: 0.75rem 1.5rem;">Guardar
-                                Cambios</button>
+                            <button type="submit" class="btn-success" style="padding: 0.75rem 1.5rem;">
+                                <span class="material-icons">check</span>
+                                Guardar Cambios
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -252,10 +254,24 @@
                                 <option value="6">Bodega</option>
                             </select>
                         </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Moneda</label>
+                            <select id="moneda" required>
+                                <option value="USD">USD - Dólar Estadounidense</option>
+                                <option value="MXN">MXN - Peso Mexicano</option>
+                            </select>
+                        </div>
 
                         <div class="form-group">
                             <label>Precio</label>
-                            <input type="number" id="precio" step="0.01" required>
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <span id="currencySymbol" style="position: absolute; left: 12px; color: #64748B; font-weight: 500;">$</span>
+                                <input type="text" id="precioDisplay" placeholder="0" required style="padding-left: 28px;">
+                                <input type="hidden" id="precio">
+                            </div>
                         </div>
                     </div>
 
@@ -274,7 +290,41 @@
 
                         <div class="form-group">
                             <label>Estado</label>
-                            <input type="text" id="estado" required>
+                            <select id="estado" required>
+                                <option value="">Seleccionar estado...</option>
+                                <option value="Aguascalientes">Aguascalientes</option>
+                                <option value="Baja California">Baja California</option>
+                                <option value="Baja California Sur">Baja California Sur</option>
+                                <option value="Campeche">Campeche</option>
+                                <option value="Chiapas">Chiapas</option>
+                                <option value="Chihuahua">Chihuahua</option>
+                                <option value="Ciudad de México">Ciudad de México</option>
+                                <option value="Coahuila">Coahuila</option>
+                                <option value="Colima">Colima</option>
+                                <option value="Durango">Durango</option>
+                                <option value="Estado de México">Estado de México</option>
+                                <option value="Guanajuato">Guanajuato</option>
+                                <option value="Guerrero">Guerrero</option>
+                                <option value="Hidalgo">Hidalgo</option>
+                                <option value="Jalisco">Jalisco</option>
+                                <option value="Michoacán">Michoacán</option>
+                                <option value="Morelos">Morelos</option>
+                                <option value="Nayarit">Nayarit</option>
+                                <option value="Nuevo León">Nuevo León</option>
+                                <option value="Oaxaca">Oaxaca</option>
+                                <option value="Puebla">Puebla</option>
+                                <option value="Querétaro">Querétaro</option>
+                                <option value="Quintana Roo">Quintana Roo</option>
+                                <option value="San Luis Potosí">San Luis Potosí</option>
+                                <option value="Sinaloa">Sinaloa</option>
+                                <option value="Sonora">Sonora</option>
+                                <option value="Tabasco">Tabasco</option>
+                                <option value="Tamaulipas">Tamaulipas</option>
+                                <option value="Tlaxcala">Tlaxcala</option>
+                                <option value="Veracruz">Veracruz</option>
+                                <option value="Yucatán">Yucatán</option>
+                                <option value="Zacatecas">Zacatecas</option>
+                            </select>
                         </div>
                     </div>
 
@@ -347,9 +397,12 @@
                     </div>
 
                     <div class="modal-actions">
-                        <button type="button" class="btn-secondary" id="cancelModal">Cancelar</button>
-                        <button type="submit" class="btn-primary">
-                            <span class="material-icons">save</span>
+                        <button type="button" class="btn-danger" id="cancelModal">
+                            <span class="material-icons">close</span>
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn-success">
+                            <span class="material-icons">check</span>
                             Guardar
                         </button>
                     </div>
@@ -425,9 +478,12 @@
                     </div>
 
                     <div class="modal-actions">
-                        <button type="button" class="btn-secondary" id="cancelAgentModal">Cancelar</button>
-                        <button type="submit" class="btn-primary">
-                            <span class="material-icons">save</span>
+                        <button type="button" class="btn-danger" id="cancelAgentModal">
+                            <span class="material-icons">close</span>
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn-success">
+                            <span class="material-icons">check</span>
                             Guardar
                         </button>
                     </div>
@@ -482,9 +538,14 @@
             <h2 class="success-title" id="confirmTitle">¿Estás seguro?</h2>
             <p class="success-message" id="confirmMessage">Esta acción no se puede deshacer.</p>
             <div class="modal-actions" style="justify-content: center; gap: 1rem;">
-                <button class="btn-secondary" id="btnConfirmCancel" style="width: 50%;">Cancelar</button>
-                <button class="btn-danger" id="btnConfirmAction"
-                    style="width: 50%; background: #EF4444; color: white;">Eliminar</button>
+                <button class="btn-secondary" id="btnConfirmCancel" style="width: 48%;">
+                    <span class="material-icons">close</span>
+                    Cancelar
+                </button>
+                <button class="btn-danger" id="btnConfirmAction" style="width: 48%;">
+                    <span class="material-icons">delete</span>
+                    Eliminar
+                </button>
             </div>
         </div>
     </div>

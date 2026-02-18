@@ -54,10 +54,8 @@ export class FeaturedPropertiesViewModel {
         this.container.querySelectorAll('.featured-property-card').forEach(card => {
             card.addEventListener('click', () => {
                 const id = card.dataset.id;
-                const prop = this.properties.find(p => p.id == id);
-                if (prop && this.modal) {
-                    this.modal.open(prop);
-                }
+                // Navigate to property detail page
+                window.location.href = `property-detail.html?id=${id}`;
             });
         });
     }

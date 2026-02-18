@@ -144,6 +144,14 @@ export class CarouselViewModel {
                 </button>
             </div>
         `;
+
+        // Add click event to details button
+        const detailsBtn = document.getElementById(`carouselDetailsBtn-${p.id}`);
+        if (detailsBtn) {
+            detailsBtn.addEventListener('click', () => {
+                window.location.href = `property-detail.html?id=${p.id}`;
+            });
+        }
     }
 
     next() {

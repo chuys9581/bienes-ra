@@ -1,4 +1,7 @@
 <?php
+// Suprimir warnings deprecados para evitar que rompan las respuestas JSON
+error_reporting(E_ALL & ~E_DEPRECATED);
+
 require_once 'config.php';
 
 $pdo = getDBConnection();

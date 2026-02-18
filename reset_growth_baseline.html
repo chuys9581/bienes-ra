@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Growth Baseline</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #10B981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #059669;
+        }
+        .danger {
+            background: #EF4444;
+        }
+        .danger:hover {
+            background: #DC2626;
+        }
+        .info {
+            background: #f0f9ff;
+            padding: 15px;
+            border-left: 4px solid #3B82F6;
+            margin: 15px 0;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔄 Gestión de Baseline de Crecimiento</h1>
+        
+        <div class="info">
+            <strong>ℹ️ ¿Qué es el baseline?</strong><br>
+            El baseline es el punto de referencia para calcular el crecimiento. 
+            Por ejemplo, si tienes 4 agentes cuando estableces el baseline, 
+            y luego agregas 1 más (5 total), el crecimiento será del +25%.
+        </div>
+
+        <h3>📊 Estado Actual</h3>
+        <pre id="currentState">Cargando...</pre>
+
+        <h3>⚙️ Acciones</h3>
+        <button onclick="viewBaseline()">Ver Baseline Actual</button>
+        <button onclick="resetToZero()" class="danger">Resetear a 0 (mostrar 100% de crecimiento)</button>
+        <button onclick="setToCurrentCount()">Establecer al Conteo Actual</button>
+        <button onclick="clearAll()" class="danger">Limpiar Todo</button>
+
+        <div id="result" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        async function getAgentsCount() {
+            try {
+                const response = await fetch('http://localhost:8000/api/agentes.php');
+                const data = await response.json();
+                return data.success ? data.data.length : 0;
+            } catch (error) {
+                return 0;
+            }
+        }
+
+        async function getPropertiesCount() {
+            try {
+                const response = await fetch('http://localhost:8000/api/propiedades.php');
+                const data = await response.json();
+                return data.success ? data.data.length : 0;
+            } catch (error) {
+                return 0;
+            }
+        }
+
+        async function viewBaseline() {
+            const baselineProp = localStorage.getItem('baselinePropCount') || '0';
+            const baselineAgent = localStorage.getItem('baselineAgentCount') || '0';
+            
+            const currentProps = await getPropertiesCount();
+            const currentAgents = await getAgentsCount();
+
+            document.getElementById('currentState').textContent = 
+`Baseline Propiedades: ${baselineProp}
+Conteo Actual Propiedades: ${currentProps}
+Crecimiento: ${baselineProp > 0 ? Math.round(((currentProps - baselineProp) / baselineProp) * 100) + '%' : 'N/A'}
+
+Baseline Agentes: ${baselineAgent}
+Conteo Actual Agentes: ${currentAgents}
+Crecimiento: ${baselineAgent > 0 ? Math.round(((currentAgents - baselineAgent) / baselineAgent) * 100) + '%' : 'N/A'}`;
+
+            showResult('✅ Estado actualizado', 'success');
+        }
+
+        async function resetToZero() {
+            localStorage.setItem('baselinePropCount', '0');
+            localStorage.setItem('baselineAgentCount', '0');
+            showResult('✅ Baseline reseteado a 0. Recarga el dashboard para ver 100% de crecimiento.', 'success');
+            await viewBaseline();
+        }
+
+        async function setToCurrentCount() {
+            const currentProps = await getPropertiesCount();
+            const currentAgents = await getAgentsCount();
+            
+            localStorage.setItem('baselinePropCount', currentProps);
+            localStorage.setItem('baselineAgentCount', currentAgents);
+            
+            showResult(`✅ Baseline establecido: ${currentProps} propiedades, ${currentAgents} agentes. Recarga el dashboard para ver 0% de crecimiento.`, 'success');
+            await viewBaseline();
+        }
+
+        function clearAll() {
+            localStorage.removeItem('baselinePropCount');
+            localStorage.removeItem('baselineAgentCount');
+            showResult('✅ Todo limpiado. El baseline se establecerá automáticamente en la próxima carga.', 'success');
+            document.getElementById('currentState').textContent = 'Baseline eliminado del localStorage';
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `<div style="padding: 15px; background: ${type === 'success' ? '#D1FAE5' : '#FEE2E2'}; color: ${type === 'success' ? '#065F46' : '#991B1B'}; border-radius: 6px; font-weight: 600;">${message}</div>`;
+        }
+
+        // Load on page load
+        viewBaseline();
+    </script>
+</body>
+</html>

@@ -1,4 +1,7 @@
 <?php
+// Suprimir warnings deprecados para evitar que rompan las respuestas JSON
+error_reporting(E_ALL & ~E_DEPRECATED);
+
 // Headers
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
@@ -65,6 +68,10 @@ try {
         }
     } elseif ($method === 'POST') {
         
+        error_log("🚀 POST Request recibido");
+        error_log("📋 POST data: " . print_r($_POST, true));
+        error_log("📷 FILES data: " . print_r($_FILES, true));
+        
         $action = isset($_GET['action']) ? $_GET['action'] : null;
 
         if ($action === 'delete_image') {
@@ -84,8 +91,11 @@ try {
 
         } else {
             // Create or Update Property
+            error_log("✏️ Procesando crear/actualizar propiedad");
             $data = $_POST;
             $id = isset($_GET['id']) ? $_GET['id'] : (isset($data['id']) ? $data['id'] : null);
+            
+            error_log("🆔 Property ID: " . ($id ?? 'nuevo'));
             
             // Cloudinary Config
             $cloudName = 'dglemuw3c'; 
@@ -98,26 +108,43 @@ try {
 
             // Handle Single File (Old compatibility or specific field)
             if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+                error_log("📤 Subiendo imagen única a Cloudinary...");
                 $imageUrl = uploadToCloudinary($_FILES['imagen']['tmp_name'], $cloudinaryUrl, $apiKey, $apiSecret);
                 if ($imageUrl) {
                     $data['imagen_principal'] = $imageUrl;
                     $mainImageUrl = $imageUrl;
+                    error_log("✅ Imagen única subida: " . $imageUrl);
                 }
             }
             
             // Handle Multiple Files (imagenes[])
             // Note: PHP structure for multiple files is $_FILES['imagenes']['name'][i], etc.
             if (isset($_FILES['imagenes'])) {
+                error_log("📤 Procesando múltiples imágenes...");
                 $fileCount = count($_FILES['imagenes']['name']);
+                error_log("📷 Total de archivos: " . $fileCount);
+                
                 for ($i = 0; $i < $fileCount; $i++) {
                     if ($_FILES['imagenes']['error'][$i] === UPLOAD_ERR_OK) {
                         $tmpPath = $_FILES['imagenes']['tmp_name'][$i];
+                        $fileName = $_FILES['imagenes']['name'][$i];
+                        $fileSize = $_FILES['imagenes']['size'][$i];
+                        
+                        error_log("📷 Subiendo imagen $i: $fileName (" . round($fileSize/1024, 2) . " KB)");
+                        
                         $url = uploadToCloudinary($tmpPath, $cloudinaryUrl, $apiKey, $apiSecret);
                         if ($url) {
                             $uploadedImages[] = $url;
+                            error_log("✅ Imagen $i subida exitosamente: " . $url);
+                        } else {
+                            error_log("❌ Error al subir imagen $i: $fileName");
                         }
+                    } else {
+                        error_log("⚠️ Error en archivo $i: " . $_FILES['imagenes']['error'][$i]);
                     }
                 }
+                
+                error_log("📦 Total de imágenes subidas: " . count($uploadedImages));
             }
 
             // If main image was set via single file upload, ensure it's in the list too if we want (optional)
@@ -126,23 +153,33 @@ try {
             
             if (empty($data['imagen_principal']) && !empty($uploadedImages)) {
                 $data['imagen_principal'] = $uploadedImages[0];
+                error_log("🖼️ Estableciendo primera imagen como principal: " . $data['imagen_principal']);
             }
             
             // Pass all new images to model
             $data['imagenes'] = $uploadedImages;
             
+            error_log("💾 Guardando en base de datos...");
+            error_log("📋 Data a guardar: " . print_r($data, true));
+            
             if ($id) {
                 // Update
+                error_log("✏️ Actualizando propiedad ID: " . $id);
                 if ($propiedad->update($id, $data)) {
+                    error_log("✅ Propiedad actualizada exitosamente");
                     $response = ['success' => true, 'message' => 'Propiedad actualizada'];
                 } else {
+                    error_log("❌ Error al actualizar propiedad");
                     $response = ['success' => false, 'message' => 'Error al actualizar'];
                 }
             } else {
                 // Create
+                error_log("➕ Creando nueva propiedad");
                 if ($propiedad->create($data)) {
+                    error_log("✅ Propiedad creada exitosamente");
                     $response = ['success' => true, 'message' => 'Propiedad creada'];
                 } else {
+                    error_log("❌ Error al crear propiedad");
                     $response = ['success' => false, 'message' => 'Error al crear'];
                 }
             }
@@ -164,17 +201,21 @@ try {
         $response = ['success' => false, 'message' => 'Method Not Allowed'];
     }
 } catch (Exception $e) {
+    error_log("❌ Exception caught: " . $e->getMessage());
+    error_log("❌ Stack trace: " . $e->getTraceAsString());
     http_response_code(500);
-    $response = ['success' => false, 'error' => $e->getMessage()];
+    $response = ['success' => false, 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()];
 }
 
 echo json_encode($response);
 
 // Helper function
 function uploadToCloudinary($filePath, $url, $apiKey, $apiSecret) {
-     $timestamp = time();
-     $signatureParams = "timestamp=$timestamp$apiSecret";
-     $signature = sha1($signatureParams);
+    error_log("☁️ Subiendo a Cloudinary: " . $filePath);
+    
+    $timestamp = time();
+    $signatureParams = "timestamp=$timestamp$apiSecret";
+    $signature = sha1($signatureParams);
     
     $postFields = [
         'file' => new CURLFile($filePath),
@@ -190,13 +231,31 @@ function uploadToCloudinary($filePath, $url, $apiKey, $apiSecret) {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     
     $cloudRes = curl_exec($ch);
-    curl_close($ch);
+    $curlError = curl_error($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    // curl_close() is a no-op since PHP 8.0 and deprecated since 8.5
+    unset($ch);
+    
+    error_log("☁️ Cloudinary HTTP Code: " . $httpCode);
+    
+    if ($curlError) {
+        error_log("❌ cURL Error: " . $curlError);
+        return null;
+    }
+    
+    error_log("☁️ Cloudinary Response: " . $cloudRes);
     
     $cloudData = json_decode($cloudRes, true);
     
     if (isset($cloudData['secure_url'])) {
+        error_log("✅ Upload exitoso: " . $cloudData['secure_url']);
         return $cloudData['secure_url'];
     }
+    
+    if (isset($cloudData['error'])) {
+        error_log("❌ Cloudinary Error: " . print_r($cloudData['error'], true));
+    }
+    
     return null;
 }
 ?>

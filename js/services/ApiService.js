@@ -76,4 +76,14 @@ export class ApiService {
     async getDestacadaProperties(limit = 6) {
         return this.getProperties(`destacada=1&limit=${limit}`);
     }
+
+    /**
+     * Obtiene todas las propiedades sin filtros.
+     * @param {number} limit - Límite opcional de propiedades.
+     * @returns {Promise<Object>}
+     */
+    async getAllProperties(limit = null) {
+        const limitParam = limit ? `limit=${limit}` : '';
+        return this.getProperties(limitParam);
+    }
 }

@@ -40,10 +40,24 @@ class Agente {
                       antiguedad = :antiguedad,
                       activo = :activo";
 
-        $stmt = $this->conn->prepare($query);
-        $this->bindParams($stmt, $data);
-
-        return $stmt->execute();
+        try {
+            $stmt = $this->conn->prepare($query);
+            $this->bindParams($stmt, $data);
+            $result = $stmt->execute();
+            
+            if (!$result) {
+                error_log("❌ [AGENTE MODEL] Error PDO: " . print_r($stmt->errorInfo(), true));
+                return false;
+            }
+            
+            // Return the ID of the newly created agent
+            $newId = $this->conn->lastInsertId();
+            error_log("✅ [AGENTE MODEL] Agente insertado con ID: $newId");
+            return $newId;
+        } catch (Exception $e) {
+            error_log("💥 [AGENTE MODEL] Exception en create: " . $e->getMessage());
+            throw $e;
+        }
     }
 
     public function update($id, $data) {
@@ -58,11 +72,21 @@ class Agente {
                       activo = :activo
                   WHERE id = :id";
 
-        $stmt = $this->conn->prepare($query);
-        $this->bindParams($stmt, $data);
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-
-        return $stmt->execute();
+        try {
+            $stmt = $this->conn->prepare($query);
+            $this->bindParams($stmt, $data);
+            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+            $result = $stmt->execute();
+            
+            if (!$result) {
+                error_log("❌ [AGENTE MODEL] Error PDO en update: " . print_r($stmt->errorInfo(), true));
+            }
+            
+            return $result;
+        } catch (Exception $e) {
+            error_log("💥 [AGENTE MODEL] Exception en update: " . $e->getMessage());
+            throw $e;
+        }
     }
 
     public function delete($id) {

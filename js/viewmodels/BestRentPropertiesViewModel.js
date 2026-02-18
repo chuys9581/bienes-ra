@@ -57,11 +57,9 @@ export class BestRentPropertiesViewModel {
         // Add click events
         this.container.querySelectorAll('.rent-property-card').forEach(card => {
             card.addEventListener('click', (e) => {
+                // Navigate to property detail page
                 const id = card.dataset.id;
-                const prop = this.properties.find(p => p.id == id);
-                if (prop && this.modal) {
-                    this.modal.open(prop);
-                }
+                window.location.href = `property-detail.html?id=${id}`;
             });
         });
     }

@@ -1,4 +1,7 @@
 <?php
+// Suprimir warnings deprecados para evitar que rompan las respuestas JSON
+error_reporting(E_ALL & ~E_DEPRECATED);
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');

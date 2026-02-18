@@ -82,6 +82,7 @@ class Propiedad {
         $propiedad = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($propiedad) {
             $propiedad['imagenes'] = $this->getImages($id);
+            $propiedad['agente'] = $this->getAgent($id);
         }
         return $propiedad;
     }
@@ -91,6 +92,7 @@ class Propiedad {
                       descripcion = :descripcion, 
                       tipo_propiedad_id = :tipo_propiedad_id, 
                       precio = :precio, 
+                      moneda = :moneda,
                       direccion = :direccion, 
                       ciudad = :ciudad, 
                       estado = :estado, 
@@ -126,6 +128,7 @@ class Propiedad {
                       descripcion = :descripcion, 
                       tipo_propiedad_id = :tipo_propiedad_id, 
                       precio = :precio, 
+                      moneda = :moneda,
                       direccion = :direccion, 
                       ciudad = :ciudad, 
                       estado = :estado, 
@@ -168,6 +171,7 @@ class Propiedad {
         $stmt->bindValue(':descripcion', htmlspecialchars(strip_tags($data['descripcion'])));
         $stmt->bindValue(':tipo_propiedad_id', $data['tipo_propiedad_id']);
         $stmt->bindValue(':precio', $data['precio']);
+        $stmt->bindValue(':moneda', isset($data['moneda']) ? $data['moneda'] : 'MXN');
         $stmt->bindValue(':direccion', htmlspecialchars(strip_tags($data['direccion'])));
         $stmt->bindValue(':ciudad', htmlspecialchars(strip_tags($data['ciudad'])));
         $stmt->bindValue(':estado', htmlspecialchars(strip_tags($data['estado'])));
@@ -186,7 +190,7 @@ class Propiedad {
     public function addImages($propiedad_id, $images) {
         if (empty($images)) return true;
         
-        $query = "INSERT INTO propiedad_imagenes (propiedad_id, url_imagen) VALUES (:propiedad_id, :url_imagen)";
+        $query = "INSERT INTO imagenes_propiedad (propiedad_id, url_imagen) VALUES (:propiedad_id, :url_imagen)";
         $stmt = $this->conn->prepare($query);
 
         foreach ($images as $url) {
@@ -198,15 +202,26 @@ class Propiedad {
     }
 
     public function getImages($propiedad_id) {
-        $query = "SELECT * FROM propiedad_imagenes WHERE propiedad_id = :propiedad_id";
+        $query = "SELECT * FROM imagenes_propiedad WHERE propiedad_id = :propiedad_id ORDER BY orden ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindValue(':propiedad_id', $propiedad_id);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
+    public function getAgent($propiedad_id) {
+        $query = "SELECT a.* FROM agentes a 
+                  INNER JOIN agente_propiedades ap ON a.id = ap.agente_id 
+                  WHERE ap.propiedad_id = :propiedad_id 
+                  LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(':propiedad_id', $propiedad_id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
     public function deleteImage($id) {
-        $query = "DELETE FROM propiedad_imagenes WHERE id = :id";
+        $query = "DELETE FROM imagenes_propiedad WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindValue(':id', $id);
         return $stmt->execute();

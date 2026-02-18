@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS propiedades (
     descripcion TEXT,
     tipo_propiedad_id INT NOT NULL,
     precio DECIMAL(12, 2) NOT NULL,
+    moneda VARCHAR(3) DEFAULT 'MXN',
     direccion VARCHAR(255) NOT NULL,
     ciudad VARCHAR(100) NOT NULL,
     estado VARCHAR(100) NOT NULL,

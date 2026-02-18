@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Detalle de la propiedad - Inmobiliaria Elite">
+    <title>Detalle de Propiedad - Inmobiliaria Elite</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header" id="main-header">
+        <!-- Rendered by JS -->
+    </header>
+
+    <!-- Property Detail Section -->
+    <section class="property-detail-section">
+        <div class="container">
+            <!-- Loading State -->
+            <div id="property-loading" class="property-loading">
+                <div class="loading-spinner"></div>
+                <p>Cargando información de la propiedad...</p>
+            </div>
+
+            <!-- Property Content -->
+            <div id="property-content" class="property-detail-content" style="display: none;">
+                <!-- Breadcrumb -->
+                <nav class="breadcrumb">
+                    <a href="index.html">Inicio</a>
+                    <span class="material-icons">chevron_right</span>
+                    <a href="index.html#propiedades">Propiedades</a>
+                    <span class="material-icons">chevron_right</span>
+                    <span id="breadcrumb-title">Detalle</span>
+                </nav>
+
+                <!-- Image Gallery -->
+                <div class="property-gallery">
+                    <!-- Main Image -->
+                    <div class="gallery-main">
+                        <img id="main-image" src="" alt="Propiedad">
+                        <div class="gallery-controls">
+                            <button class="gallery-control-btn" id="view-photos-btn">
+                                <span class="material-icons">photo_camera</span>
+                                Ver Fotos
+                            </button>
+                            <button class="gallery-control-btn" id="view-3d-btn">
+                                <span class="material-icons">view_in_ar</span>
+                                Vista 3D
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Thumbnail Gallery -->
+                    <div class="gallery-thumbnails" id="gallery-thumbnails">
+                        <!-- Thumbnails will be loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Property Information -->
+                <div class="property-main-info">
+                    <div class="property-content-grid">
+                        <!-- Left Column: Details -->
+                        <div class="property-main-content">
+                            <!-- Main Property Card -->
+                            <div class="property-section property-main-card">
+                                <!-- Badges -->
+                                <div class="property-badges" id="property-badges">
+                                    <!-- Badges will be loaded dynamically -->
+                                </div>
+                                
+                                <!-- Title & Price in same row -->
+                                <div class="property-title-price-row">
+                                    <h1 class="property-main-title" id="property-title">Título de la Propiedad</h1>
+                                    <div class="property-price-header">
+                                        <span class="property-price-large" id="property-price">$0</span>
+                                        <span class="property-price-period" id="property-price-period"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Location -->
+                                <div class="property-location-section">
+                                    <span class="material-icons">location_on</span>
+                                    <span id="property-address">Dirección</span>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="property-description-wrapper">
+                                    <h2 class="property-section-title">Description</h2>
+                                    <p class="property-description" id="property-description">
+                                        Descripción de la propiedad...
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Overview -->
+                            <div class="property-section">
+                                <h2 class="property-section-title">Overview</h2>
+                                <div class="property-overview-grid" id="property-overview">
+                                    <!-- Overview items will be loaded dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Address -->
+                            <div class="property-section">
+                                <div class="property-section-header">
+                                    <h2 class="property-section-title">Address</h2>
+                                    <button class="btn-google-maps" id="btn-google-maps">
+                                        <span class="material-icons">map</span>
+                                        Open on Google Maps
+                                    </button>
+                                </div>
+                                <div class="property-address-grid" id="property-address-details">
+                                    <!-- Address details will be loaded dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Details -->
+                            <div class="property-section">
+                                <h2 class="property-section-title">Details</h2>
+                                <div class="property-details-grid" id="property-details-grid">
+                                    <!-- Details will be loaded dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Features -->
+                            <div class="property-section">
+                                <h2 class="property-section-title">Features</h2>
+                                <div class="property-features-grid" id="property-features-grid">
+                                    <!-- Features will be loaded dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Floor Plans -->
+                            <div class="property-section">
+                                <h2 class="property-section-title">Floor Plans</h2>
+                                <div class="floor-plans-accordion" id="floor-plans-accordion">
+                                    <!-- Floor plans will be loaded dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Video -->
+                            <div class="property-section">
+                                <h2 class="property-section-title">Video</h2>
+                                <div class="property-video-container" id="property-video-container">
+                                    <!-- Video will be loaded dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Virtual Tour -->
+                            <div class="property-section">
+                                <h2 class="property-section-title">Virtual Tour</h2>
+                                <div class="property-virtual-tour-container" id="property-virtual-tour-container">
+                                    <!-- Virtual tour will be loaded dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="property-section">
+                                <h2 class="property-section-title">Location</h2>
+                                <div class="property-location-map" id="property-location-map">
+                                    <!-- Map will be loaded dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Rating & Reviews -->
+                            <div class="property-section">
+                                <h2 class="property-section-title">Rating & Reviews</h2>
+                                
+                                <!-- Rating Summary -->
+                                <div class="rating-summary-grid" id="rating-summary">
+                                    <!-- Rating summary will be loaded dynamically -->
+                                </div>
+
+                                <!-- Reviews List -->
+                                <div class="reviews-section">
+                                    <h3 class="reviews-section-title" id="reviews-title">No Reviews</h3>
+                                    <div class="reviews-list" id="reviews-list">
+                                        <!-- Reviews will be loaded dynamically -->
+                                    </div>
+                                </div>
+
+                                <!-- Write Review -->
+                                <div class="write-review-section">
+                                    <h3 class="write-review-title">Write A Review</h3>
+                                    <form class="review-form" id="review-form">
+                                        <div class="form-group">
+                                            <label class="form-label">Your Rating</label>
+                                            <div class="star-rating-input" id="star-rating-input">
+                                                <span class="star-input" data-rating="1">★</span>
+                                                <span class="star-input" data-rating="2">★</span>
+                                                <span class="star-input" data-rating="3">★</span>
+                                                <span class="star-input" data-rating="4">★</span>
+                                                <span class="star-input" data-rating="5">★</span>
+                                            </div>
+                                            <input type="hidden" id="rating-value" name="rating" value="0" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="reviewer-name">Your Name *</label>
+                                            <input type="text" id="reviewer-name" class="form-input" placeholder="Enter your name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="reviewer-email">Your Email *</label>
+                                            <input type="email" id="reviewer-email" class="form-input" placeholder="Enter your email" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="review-text">Your Review *</label>
+                                            <textarea id="review-text" class="form-textarea" rows="5" placeholder="Write your review here..." required></textarea>
+                                        </div>
+                                        <button type="submit" class="btn-submit-review">
+                                            Submit Review
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Similar Homes -->
+                            <div class="property-section">
+                                <h2 class="property-section-title">Similar Homes You May Like</h2>
+                                <div class="similar-homes-carousel">
+                                    <button class="carousel-nav-btn prev" id="similar-prev">
+                                        <span class="material-icons">chevron_left</span>
+                                    </button>
+                                    <div class="similar-homes-wrapper">
+                                        <div class="similar-homes-track" id="similar-homes-track">
+                                            <!-- Similar properties will be loaded dynamically -->
+                                        </div>
+                                    </div>
+                                    <button class="carousel-nav-btn next" id="similar-next">
+                                        <span class="material-icons">chevron_right</span>
+                                    </button>
+                                </div>
+                                <div class="carousel-dots" id="similar-dots">
+                                    <!-- Dots will be loaded dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Agent -->
+                        <div class="property-agent-sidebar">
+                            <div class="agent-detail-card" id="agent-detail-card">
+                                <div class="agent-avatar-large" id="agent-avatar-container">
+                                    <img src="" alt="Agente" id="agent-avatar">
+                                </div>
+                                <h3 class="agent-name-large" id="agent-name">Nombre del Agente</h3>
+                                <div class="agent-rating" id="agent-rating">
+                                    <span class="stars">★★★★★</span>
+                                    <span class="review-count">(1 review)</span>
+                                </div>
+                                <div class="agent-contact-info">
+                                    <div class="agent-contact-item">
+                                        <span class="material-icons">email</span>
+                                        <span id="agent-email">email@example.com</span>
+                                    </div>
+                                    <div class="agent-contact-item">
+                                        <span class="material-icons">phone</span>
+                                        <span id="agent-phone">+00 0000 000 000</span>
+                                    </div>
+                                </div>
+                                <div class="agent-social-links" id="agent-social">
+                                    <!-- Social links will be loaded dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Contact Form -->
+                            <div class="contact-form-card">
+                                <form class="contact-form-detail" id="contact-form">
+                                    <div class="form-group">
+                                        <input type="text" placeholder="Full Name *" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="tel" placeholder="Phone Number *" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="email" placeholder="Email Address *" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <textarea placeholder="Hello, I am interested in [Property Title]" rows="4"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn-send-message">
+                                        Send message
+                                    </button>
+                                    <button type="button" class="btn-call" id="btn-call-agent">
+                                        <span class="material-icons">phone</span>
+                                        Call
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="main-footer">
+        <!-- Rendered by JS -->
+    </footer>
+
+    <!-- Fullscreen Gallery Modal -->
+    <div class="gallery-modal" id="gallery-modal">
+        <div class="gallery-modal-content">
+            <button class="gallery-modal-close" id="gallery-modal-close">
+                <span class="material-icons">close</span>
+            </button>
+            <button class="gallery-modal-nav prev" id="gallery-prev">
+                <span class="material-icons">chevron_left</span>
+            </button>
+            <button class="gallery-modal-nav next" id="gallery-next">
+                <span class="material-icons">chevron_right</span>
+            </button>
+            <img id="gallery-modal-image" src="" alt="Imagen de propiedad">
+            <div class="gallery-modal-counter" id="gallery-counter">1 / 1</div>
+        </div>
+    </div>
+
+    <!-- Script Principal como Módulo -->
+    <script type="module" src="./js/viewmodels/PropertyDetailViewModel.js"></script>
+</body>
+
+</html>

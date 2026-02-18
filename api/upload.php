@@ -1,6 +1,6 @@
 <?php
-// Prevent any HTML output/warnings
-error_reporting(E_ALL);
+// Prevent any HTML output/warnings - Suppress deprecated warnings
+error_reporting(E_ALL & ~E_DEPRECATED);
 ini_set('display_errors', 0);
 
 // Buffer output to catch any stray warnings
@@ -55,7 +55,7 @@ try {
             throw new Exception("Curl Error: " . curl_error($ch));
         }
         
-        curl_close($ch);
+        // curl_close() no es necesario en PHP 8.0+ y está deprecado en PHP 8.5+
         
         $cloudData = json_decode($cloudRes, true);
         

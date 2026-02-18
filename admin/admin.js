@@ -63,9 +63,66 @@ document.getElementById('btnLogout').addEventListener('click', async () => {
 function updateDashboardStats() {
     const propCount = document.getElementById('totalPropiedades');
     const agentCount = document.getElementById('totalAgentes');
+    const propGrowth = document.getElementById('propGrowthVal');
+    const agentGrowth = document.getElementById('agentGrowthVal');
 
-    if (propCount) propCount.textContent = propiedades.length;
-    if (agentCount) agentCount.textContent = agentes.length;
+    const currentPropCount = propiedades.length;
+    const currentAgentCount = agentes.length;
+
+    // Update counts
+    if (propCount) propCount.textContent = currentPropCount;
+    if (agentCount) agentCount.textContent = currentAgentCount;
+
+    // Get baseline counts from localStorage (set on first load or manual reset)
+    let baselinePropCount = parseInt(localStorage.getItem('baselinePropCount') || '0');
+    let baselineAgentCount = parseInt(localStorage.getItem('baselineAgentCount') || '0');
+
+    // If baseline is 0, set it to current count (first time)
+    if (baselinePropCount === 0 && currentPropCount > 0) {
+        baselinePropCount = currentPropCount;
+        localStorage.setItem('baselinePropCount', baselinePropCount);
+        console.log('📊 Baseline de Propiedades establecido:', baselinePropCount);
+    }
+    if (baselineAgentCount === 0 && currentAgentCount > 0) {
+        baselineAgentCount = currentAgentCount;
+        localStorage.setItem('baselineAgentCount', baselineAgentCount);
+        console.log('📊 Baseline de Agentes establecido:', baselineAgentCount);
+    }
+
+    // Calculate growth percentages
+    const propGrowthPercent = baselinePropCount > 0 
+        ? Math.round(((currentPropCount - baselinePropCount) / baselinePropCount) * 100)
+        : 0;
+    
+    const agentGrowthPercent = baselineAgentCount > 0 
+        ? Math.round(((currentAgentCount - baselineAgentCount) / baselineAgentCount) * 100)
+        : 0;
+
+    console.log('📈 Crecimiento calculado:', {
+        propiedades: { baseline: baselinePropCount, actual: currentPropCount, crecimiento: propGrowthPercent + '%' },
+        agentes: { baseline: baselineAgentCount, actual: currentAgentCount, crecimiento: agentGrowthPercent + '%' }
+    });
+
+    // Update growth displays
+    if (propGrowth) {
+        const sign = propGrowthPercent > 0 ? '+' : (propGrowthPercent < 0 ? '' : '');
+        propGrowth.textContent = `${sign}${propGrowthPercent}%`;
+        propGrowth.style.color = propGrowthPercent >= 0 ? '#10B981' : '#EF4444';
+    }
+
+    if (agentGrowth) {
+        const sign = agentGrowthPercent > 0 ? '+' : (agentGrowthPercent < 0 ? '' : '');
+        agentGrowth.textContent = `${sign}${agentGrowthPercent}%`;
+        agentGrowth.style.color = agentGrowthPercent >= 0 ? '#10B981' : '#EF4444';
+    }
+}
+
+// Function to reset growth baseline (can be called manually or on schedule)
+function resetGrowthBaseline() {
+    localStorage.setItem('baselinePropCount', propiedades.length);
+    localStorage.setItem('baselineAgentCount', agentes.length);
+    updateDashboardStats();
+    console.log('📊 Baseline de crecimiento actualizado');
 }
 
 // ==================== NAVIGATION ====================
@@ -337,6 +394,9 @@ function openModal(property = null) {
         document.getElementById('descripcion').value = property.descripcion || '';
         document.getElementById('tipo_propiedad_id').value = property.tipo_propiedad_id;
         document.getElementById('precio').value = property.precio;
+        // Format price for display
+        document.getElementById('precioDisplay').value = formatPriceInput(property.precio);
+        document.getElementById('moneda').value = property.moneda || 'MXN';
         document.getElementById('direccion').value = property.direccion;
         document.getElementById('ciudad').value = property.ciudad;
         document.getElementById('estado').value = property.estado;
@@ -352,6 +412,9 @@ function openModal(property = null) {
         document.getElementById('imagen_principal').value = property.imagen_principal || '';
     } else {
         propertyForm.reset();
+        document.getElementById('moneda').value = 'MXN';
+        document.getElementById('precioDisplay').value = '';
+        document.getElementById('precio').value = '';
     }
 
     // Image preview
@@ -472,12 +535,15 @@ window.deleteProperty = async function (id) {
 // Save Property
 propertyForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    console.log('🚀 Iniciando guardado de propiedad...');
 
     const formData = new FormData();
     formData.append('titulo', document.getElementById('titulo').value);
     formData.append('descripcion', document.getElementById('descripcion').value);
     formData.append('tipo_propiedad_id', document.getElementById('tipo_propiedad_id').value);
     formData.append('precio', document.getElementById('precio').value);
+    formData.append('moneda', document.getElementById('moneda').value);
     formData.append('direccion', document.getElementById('direccion').value);
     formData.append('ciudad', document.getElementById('ciudad').value);
     formData.append('estado', document.getElementById('estado').value);
@@ -491,28 +557,59 @@ propertyForm.addEventListener('submit', async (e) => {
     formData.append('mejor_venta', document.getElementById('mejor_venta').checked ? 1 : 0);
     formData.append('mejor_renta', document.getElementById('mejor_renta').checked ? 1 : 0);
 
+    console.log('📋 Datos del formulario:', {
+        titulo: document.getElementById('titulo').value,
+        precio: document.getElementById('precio').value,
+        moneda: document.getElementById('moneda').value,
+        estado: document.getElementById('estado').value
+    });
+
     const fileInput = document.getElementById('imagen_file');
+    console.log('📷 Archivos seleccionados:', fileInput.files.length);
+    
     if (fileInput.files.length > 0) {
         for (let i = 0; i < fileInput.files.length; i++) {
+            console.log(`  - Imagen ${i + 1}: ${fileInput.files[i].name} (${(fileInput.files[i].size / 1024).toFixed(2)} KB)`);
             formData.append('imagenes[]', fileInput.files[i]);
         }
     } else {
         formData.append('imagen_principal', document.getElementById('imagen_principal').value);
+        console.log('📷 Usando imagen principal existente');
     }
 
     try {
         let url = `${API_URL}/propiedades.php`;
-        if (editingPropertyId) formData.append('id', editingPropertyId);
+        if (editingPropertyId) {
+            formData.append('id', editingPropertyId);
+            console.log('✏️ Editando propiedad ID:', editingPropertyId);
+        } else {
+            console.log('➕ Creando nueva propiedad');
+        }
 
+        console.log('📡 Enviando request a:', url);
         const response = await fetch(url, { method: 'POST', body: formData });
-        const data = await response.json();
+        
+        console.log('📥 Response status:', response.status);
+        const responseText = await response.text();
+        console.log('📥 Response text:', responseText);
+        
+        const data = JSON.parse(responseText);
+        console.log('📦 Response data:', data);
 
         if (data.success) {
+            console.log('✅ Propiedad guardada exitosamente');
             showSuccessModal('Propiedad guardada exitosamente');
             closeModal();
             loadProperties();
-        } else { alert('Error: ' + data.message); }
-    } catch (error) { alert('Error al conectar con el servidor: ' + error.message); }
+        } else { 
+            console.error('❌ Error del servidor:', data.message);
+            alert('Error: ' + data.message); 
+        }
+    } catch (error) { 
+        console.error('❌ Error al conectar con el servidor:', error);
+        console.error('Stack trace:', error.stack);
+        alert('Error al conectar con el servidor: ' + error.message); 
+    }
 });
 
 // ============================================================
@@ -657,19 +754,44 @@ agentForm.addEventListener('submit', async (e) => {
 
     const fileInput = document.getElementById('agentImagen');
     if (fileInput.files.length > 0) {
+        console.log('📎 Archivo de imagen seleccionado:', fileInput.files[0].name);
         formData.append('imagen', fileInput.files[0]);
     } else {
-        formData.append('imagen', document.getElementById('agentImagenUrl').value);
+        const imagenUrl = document.getElementById('agentImagenUrl').value;
+        console.log('🔗 URL de imagen:', imagenUrl);
+        formData.append('imagen', imagenUrl);
     }
 
-    if (editingAgentId) formData.append('id', editingAgentId);
+    if (editingAgentId) {
+        console.log('✏️ Editando agente ID:', editingAgentId);
+        formData.append('id', editingAgentId);
+    } else {
+        console.log('➕ Creando nuevo agente');
+    }
 
+    console.log('📤 Enviando datos del agente...');
+    
     try {
         const response = await fetch(`${API_URL}/agentes.php`, {
             method: 'POST',
             body: formData // Send FormData instead of JSON
         });
+        
+        console.log('📥 Respuesta recibida - Status:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ Error del servidor:', errorText);
+            alert('Error del servidor (Status ' + response.status + '): ' + errorText.substring(0, 200));
+            return;
+        }
+        
         const data = await response.json();
+        console.log('✅ Respuesta parseada:', data);
+        
+        if (data.agent_id) {
+            console.log('🆔 ID del agente creado/actualizado:', data.agent_id);
+        }
 
         if (data.success) {
             showSuccessModal(editingAgentId ? 'Agente actualizado exitosamente' : 'Agente creado exitosamente');
@@ -874,11 +996,83 @@ function applyConfig() {
     }
 }
 
-// Initialize
+// ============================================================
+//  PRICE INPUT FORMATTING
+// ============================================================
+
+function formatPriceInput(value) {
+    // Remove non-numeric characters except decimal point
+    const numericValue = String(value).replace(/[^\d.]/g, '');
+    if (!numericValue) return '';
+    
+    // Split by decimal point
+    const parts = numericValue.split('.');
+    // Format integer part with thousands separator
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    
+    return parts.join('.');
+}
+
+function unformatPriceInput(value) {
+    // Remove commas and return numeric value
+    return String(value).replace(/,/g, '');
+}
+
+// Initialize - Combined DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
     loadProperties(); // Also loads charts initially
     applyConfig(); // Apply saved settings
+    
+    // Price input formatting
+    const precioDisplay = document.getElementById('precioDisplay');
+    const precioHidden = document.getElementById('precio');
+    const monedaSelect = document.getElementById('moneda');
+
+    if (precioDisplay) {
+        precioDisplay.addEventListener('input', (e) => {
+            const cursorPos = e.target.selectionStart;
+            const oldLength = e.target.value.length;
+            
+            // Get unformatted value
+            const unformatted = unformatPriceInput(e.target.value);
+            
+            // Update hidden field with clean value
+            if (precioHidden) {
+                precioHidden.value = unformatted;
+            }
+            
+            // Format for display
+            const formatted = formatPriceInput(unformatted);
+            e.target.value = formatted;
+            
+            // Restore cursor position
+            const newLength = formatted.length;
+            const diff = newLength - oldLength;
+            e.target.setSelectionRange(cursorPos + diff, cursorPos + diff);
+        });
+
+        // Format on blur
+        precioDisplay.addEventListener('blur', (e) => {
+            if (e.target.value) {
+                const unformatted = unformatPriceInput(e.target.value);
+                e.target.value = formatPriceInput(unformatted);
+                if (precioHidden) {
+                    precioHidden.value = unformatted;
+                }
+            }
+        });
+    }
+
+    if (monedaSelect) {
+        monedaSelect.addEventListener('change', (e) => {
+            const symbol = e.target.value === 'USD' ? '$' : '$';
+            const currencySymbol = document.getElementById('currencySymbol');
+            if (currencySymbol) {
+                currencySymbol.textContent = symbol;
+            }
+        });
+    }
 });
 
 // ============================================================

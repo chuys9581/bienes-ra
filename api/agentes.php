@@ -1,4 +1,7 @@
 <?php
+// Suprimir warnings deprecados para evitar que rompan las respuestas JSON
+error_reporting(E_ALL & ~E_DEPRECATED);
+
 // Headers
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
@@ -118,6 +121,10 @@ try {
         }
 
     } elseif ($method === 'POST') {
+        error_log("🔵 [AGENTES] Iniciando POST request");
+        error_log("🔵 [AGENTES] _POST data: " . print_r($_POST, true));
+        error_log("🔵 [AGENTES] _FILES: " . print_r($_FILES, true));
+        
         $data = $_POST;
         // Handle JSON input if no POST data
         if (empty($data)) {
@@ -126,9 +133,11 @@ try {
         }
 
         $id = $_GET['id'] ?? ($data['id'] ?? null);
+        error_log("🔵 [AGENTES] ID detectado: " . ($id ?? 'null'));
 
         // Handle File Upload to Cloudinary
         if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+            error_log("📸 [AGENTES] Subiendo imagen a Cloudinary...");
             $cloudName = 'dglemuw3c'; 
             $apiKey = '464125266981415';
             $apiSecret = '4E8o3GGpHktPm0hzTGsE0qOubn4';
@@ -152,25 +161,51 @@ try {
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             
             $cloudRes = curl_exec($ch);
-            curl_close($ch);
+            $curlError = curl_error($ch);
+            // curl_close() no es necesario en PHP 8.0+ y está deprecado en PHP 8.5+
+            
+            if ($curlError) {
+                error_log("❌ [AGENTES] Error cURL: " . $curlError);
+            }
             
             $cloudData = json_decode($cloudRes, true);
+            error_log("📸 [AGENTES] Respuesta Cloudinary: " . print_r($cloudData, true));
             
             if (isset($cloudData['secure_url'])) {
                 $data['imagen'] = $cloudData['secure_url'];
+                error_log("✅ [AGENTES] Imagen subida exitosamente: " . $data['imagen']);
+            } else {
+                error_log("⚠️ [AGENTES] No se obtuvo URL de Cloudinary");
             }
+        } elseif (isset($_FILES['imagen'])) {
+            error_log("⚠️ [AGENTES] Error en archivo imagen: " . $_FILES['imagen']['error']);
         }
 
         if ($id) {
+            error_log("✏️ [AGENTES] Actualizando agente ID: $id");
+            error_log("✏️ [AGENTES] Datos a actualizar: " . print_r($data, true));
             if ($agente->update($id, $data)) {
-                $response = ['success' => true, 'message' => 'Agente actualizado'];
+                error_log("✅ [AGENTES] Agente actualizado exitosamente");
+                if (isset($data['imagen'])) {
+                    error_log("🖼️ [AGENTES] URL de imagen guardada: " . $data['imagen']);
+                }
+                $response = ['success' => true, 'message' => 'Agente actualizado', 'agent_id' => $id];
             } else {
+                error_log("❌ [AGENTES] Error al actualizar agente");
                 $response = ['success' => false, 'message' => 'Error al actualizar agente'];
             }
         } else {
-            if ($agente->create($data)) {
-                $response = ['success' => true, 'message' => 'Agente creado'];
+            error_log("➕ [AGENTES] Creando nuevo agente");
+            error_log("➕ [AGENTES] Datos a crear: " . print_r($data, true));
+            $newId = $agente->create($data);
+            if ($newId) {
+                error_log("✅ [AGENTES] Agente creado exitosamente con ID: $newId");
+                if (isset($data['imagen'])) {
+                    error_log("🖼️ [AGENTES] URL de imagen guardada en BD: " . $data['imagen']);
+                }
+                $response = ['success' => true, 'message' => 'Agente creado', 'agent_id' => $newId];
             } else {
+                error_log("❌ [AGENTES] Error al crear agente");
                 $response = ['success' => false, 'message' => 'Error al crear agente'];
             }
         }
@@ -192,8 +227,10 @@ try {
         $response = ['success' => false, 'message' => 'Method Not Allowed'];
     }
 } catch (Exception $e) {
+    error_log("💥 [AGENTES] Exception capturada: " . $e->getMessage());
+    error_log("💥 [AGENTES] Stack trace: " . $e->getTraceAsString());
     http_response_code(500);
-    $response = ['success' => false, 'error' => $e->getMessage()];
+    $response = ['success' => false, 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()];
 }
 
 echo json_encode($response);

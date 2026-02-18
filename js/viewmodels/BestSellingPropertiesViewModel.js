@@ -85,12 +85,9 @@ export class BestSellingPropertiesViewModel {
         // Add click events
         this.container.querySelectorAll('.best-property-card').forEach(card => {
             card.addEventListener('click', (e) => {
-                // Evitar bubbling si hay botones específicos, pero por ahora toda la card
+                // Navigate to property detail page
                 const id = card.dataset.id;
-                const prop = this.properties.find(p => p.id == id);
-                if (prop && this.modal) {
-                    this.modal.open(prop);
-                }
+                window.location.href = `property-detail.html?id=${id}`;
             });
         });
     }

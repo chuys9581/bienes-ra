@@ -1,6 +1,6 @@
 <?php
 class Database {
-    private $host = 'localhost';
+    private $host = '127.0.0.1';
     private $db_name = 'inmobiliaria_db';
     private $username = 'inmobiliaria_user';
     private $password = 'inmobiliaria_pass';
